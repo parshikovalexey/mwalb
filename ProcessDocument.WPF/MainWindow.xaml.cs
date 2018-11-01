@@ -40,7 +40,7 @@ namespace ProcessDocument.WPF
 
         private void FormatDocumet_Click(object sender, RoutedEventArgs e)
         {
-            _ = new Execute(FilePath, new Gost1(@"gost1.json"), new ProcessingOpenXml(), ResultDocument);
+            _ = new Execute(FilePath, new Gost1(GostPath), new ProcessingOpenXml(), ResultDocument);
         }
 
         private void ResultDocument(ResultExecute resultexecute)
