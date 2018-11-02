@@ -11,9 +11,11 @@ namespace ProcessDocumentCore.Processing
 {
     public class ProcessingOpenXml : IDocumentProcessing
     {
+        private Standards _designStandard;
         private const string ExtensionDoc = ".docx";
         public ResultExecute Processing(Standards designStandard, string filePath)
         {
+            _designStandard = designStandard;
             PathHelper.ClearTmpDirectory();
             Stream stream = null;
             WordprocessingDocument wordDoc = null;
@@ -31,9 +33,7 @@ namespace ProcessDocumentCore.Processing
                         docText = sr.ReadToEnd();
                     }
 
-
                     var body = wordDoc.MainDocumentPart.Document.Body;
-
                     var isHeader = false;
 
                     foreach (var para in body.Elements<Paragraph>())
@@ -53,16 +53,14 @@ namespace ProcessDocumentCore.Processing
                                 if (hasNumberingProperties != null) isNeedChangeStyleForParagraph = true;
 
                                 RunProperties runProperties = run.RunProperties;
-                                runProperties.FontSize = new FontSize() { Val = "30" };
-                                runProperties.Color = new Color() { Val = "365F91" };
-                                runProperties.Bold = new Bold() { Val = true };
-                                runProperties.RunFonts = new RunFonts() { Ascii = "Times New Roman", HighAnsi = "Times New Roman" };
+                                runProperties.FontSize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
+                                runProperties.Color = new Color() { Val = _designStandard.GetHeaderColor() };
+                                runProperties.Bold = new Bold() { Val = _designStandard.isBold() };
+                                runProperties.RunFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
                             }
                         }
 
-
                         if (isNeedChangeStyleForParagraph) SetParagraphStyle(para);
-
 
                     }
 
@@ -78,7 +76,6 @@ namespace ProcessDocumentCore.Processing
             }
             catch (Exception ex)
             {
-
                 wordDoc?.Close();
                 stream?.Close();
                 return new ResultExecute().OnError(ex.Message);
@@ -105,30 +102,29 @@ namespace ProcessDocumentCore.Processing
                 if (fontSize != null)
                 {
                     var el = (FontSize)fontSize;
-                    el.Val = "30";
+                    el.Val = (_designStandard.GetFontSize() * 2).ToString();
                 }
                 else
                 {
-                    var _size = new FontSize { Val = "30" };
+                    var _size = new FontSize { Val = (_designStandard.GetFontSize() * 2).ToString() };
                     para.ParagraphProperties.ParagraphMarkRunProperties.Append(_size);
                 }
 
                 if (bold != null)
                 {
                     var el = (Bold)bold;
-                    el.Val = true;
+                    el.Val = _designStandard.isBold();
                 }
                 else
                 {
-                    var _bold = new Bold { Val = true };
+                    var _bold = new Bold { Val = _designStandard.isBold() };
                     para.ParagraphProperties.ParagraphMarkRunProperties.Append(_bold);
                 }
 
                 runFonts?.Remove();
 
-                var _runFonts = new RunFonts() { Ascii = "Times New Roman", HighAnsi = "Times New Roman" };
+                var _runFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
                 para.ParagraphProperties.ParagraphMarkRunProperties.Append(_runFonts);
-
 
                 if (color != null)
                 {
@@ -137,7 +133,7 @@ namespace ProcessDocumentCore.Processing
                 }
                 else
                 {
-                    var _color = new Color { Val = "365F91" };
+                    var _color = new Color { Val = _designStandard.GetHeaderColor() };
                     para.ParagraphProperties.ParagraphMarkRunProperties.Append(_color);
                 }
             }
