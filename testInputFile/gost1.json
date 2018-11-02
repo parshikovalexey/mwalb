@@ -1,0 +1,12 @@
+{
+  "Font": "Times New Roman",
+  "FontSize": 14,
+  "LineSpacing": 1.5,
+  "Alignment": "justify",
+  "MarginLeft": 3,
+  "MarginRight": 1,
+  "MarginTop": 2,
+  "MarginBottom": 2,
+  "HeaderColor": "655F91",
+  "Bold":true
+}

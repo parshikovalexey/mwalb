@@ -21,18 +21,32 @@ namespace ProcessDocumentCore
         public Execute(string filePath, Standards designStandard, IDocumentProcessing documentProcessing, AddPreparedDocumentInterface resultDocumentInterface )
         {
             this.PreparedDocument = resultDocumentInterface;
-            if (string.IsNullOrEmpty(filePath)) OnResponsePreparedDocument(new ResultExecute().OnError("Путь до файла не указан"));
-            if (!PathHelper.FileExists(filePath, false)) OnResponsePreparedDocument(new ResultExecute().OnError($"Указанный файл '{filePath}' не существует"));
-            if (!IsValidFile(filePath)) OnResponsePreparedDocument(new ResultExecute().OnError($"Загружен файл с неизвестным форматом '{filePath}'. Поддерживаются только файлы Word *.doc или *.docx"));
+            if (string.IsNullOrEmpty(filePath))
+            {
+                OnResponsePreparedDocument(new ResultExecute().OnError("Путь до файла не указан"));
+                return;
+            }
+
+            if (!PathHelper.FileExists(filePath, false))
+            {
+                OnResponsePreparedDocument(new ResultExecute().OnError($"Указанный файл '{filePath}' не существует")); return;
+            }
+
+            if (!IsValidFile(filePath))
+            {
+                OnResponsePreparedDocument(new ResultExecute().OnError($"Загружен файл с неизвестным форматом '{filePath}'. Поддерживаются только файлы Word *.doc или *.docx"));
+                return;
+            }
             
             //передаем данные на форматирование
             OnResponsePreparedDocument(documentProcessing.Processing(designStandard, filePath));
 
-           //OnResponsePreparedDocument(new ResultExecute(){Callbacks = filePath});
+            //OnResponsePreparedDocument(new ResultExecute(){Callbacks = filePath});
         }
 
         private bool IsValidFile(string filePath)
         {
+            if (string.IsNullOrWhiteSpace(filePath)) return false;
             string[] fileExtension = { ".doc", ".docx" };
             FileInfo f = new FileInfo(filePath);
             return fileExtension.Contains(f.Extension);

@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommonLibrary
 {
-  public  static class PathHelper
+    public static class PathHelper
     {
         public static bool DirectoryExists(string sPath, bool create)
         {
@@ -45,6 +41,33 @@ namespace CommonLibrary
             }
             return exist;
 
+        }
+
+        public static void ClearTmpDirectory()
+        {
+            try
+            {
+                string[] dirs = Directory.GetFiles(TmpDirectory());
+                foreach (var item in dirs)
+                {
+                    FileDelete(item);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+
+        }
+
+
+
+        public static string TmpDirectory()
+        {
+            var tmp = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tmp"));
+            return DirectoryExists(tmp, true) ? tmp : String.Empty;
         }
 
     }

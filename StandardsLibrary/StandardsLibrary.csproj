@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Gost1.cs" />
+    <Compile Include="GostTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Standards.cs" />
   </ItemGroup>
