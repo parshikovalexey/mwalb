@@ -40,5 +40,10 @@ namespace ProcessDocument.WPF
         {
             ResultExecuteTextBox.Text = resultexecute.ToString();
         }
+
+        private void OpenDocument_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(FilePath);
+        }
     }
 }
