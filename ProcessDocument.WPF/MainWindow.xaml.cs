@@ -1,10 +1,9 @@
 ﻿using CommonLibrary;
 using Microsoft.Win32;
 using ProcessDocumentCore;
-using StandardsLibrary;
-using System.Windows;
 using ProcessDocumentCore.Processing;
 using StandardsLibrary;
+using System.Windows;
 
 namespace ProcessDocument.WPF
 {
@@ -23,8 +22,7 @@ namespace ProcessDocument.WPF
             set => FilePathTextBox.Text = value;
         }
 
-        private string GostPath
-        {
+        private string GostPath {
             get => GostFilePathTextBox.Text;
             set => GostFilePathTextBox.Text = value;
         }
@@ -48,12 +46,17 @@ namespace ProcessDocument.WPF
             ResultExecuteTextBox.Text = resultexecute.ToString();
         }
 
+        private void OpenDocument_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(FilePath);
+        }
         private void LoadGostButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "JSON (*.json)|*.json";
             if (openFileDialog.ShowDialog() == true)
                 GostPath = openFileDialog.FileName;
+
         }
     }
 }

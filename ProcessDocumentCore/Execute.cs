@@ -28,7 +28,7 @@ namespace ProcessDocumentCore
             //передаем данные на форматирование
             OnResponsePreparedDocument(documentProcessing.Processing(designStandard, filePath));
 
-            OnResponsePreparedDocument(new ResultExecute(){Callbacks = filePath});
+           //OnResponsePreparedDocument(new ResultExecute(){Callbacks = filePath});
         }
 
         private bool IsValidFile(string filePath)
