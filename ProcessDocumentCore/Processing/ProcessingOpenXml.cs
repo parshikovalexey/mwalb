@@ -34,32 +34,28 @@ namespace ProcessDocumentCore.Processing
                     }
 
                     var body = wordDoc.MainDocumentPart.Document.Body;
-                    var isHeader = false;
 
                     foreach (var para in body.Elements<Paragraph>())
                     {
                         bool isNeedChangeStyleForParagraph = false;
-                        foreach (var itemPara in para)
+                        if (para.ToList().Any(p => p is BookmarkStart) && para.ToList().Any(p => p is BookmarkEnd))
                         {
-                            if (itemPara is BookmarkStart) isHeader = true;
-
-                            if (itemPara is BookmarkEnd) isHeader = false;
-
-                            if (itemPara is Run run && isHeader)
+                            foreach (var openXmlElement1 in para.ToList().Where(x => x is Run).ToList())
                             {
+                                var openXmlElement = (Run)openXmlElement1;
                                 //Определяем есть ли нумерованный список для задания стиля всему параграфу, т.к. на него распотсраняется отдельный стиль
                                 var hasNumberingProperties = para.ParagraphProperties.FirstOrDefault(o =>
                                     o.GetType() == typeof(NumberingProperties));
                                 if (hasNumberingProperties != null) isNeedChangeStyleForParagraph = true;
 
-                                RunProperties runProperties = run.RunProperties;
+                                RunProperties runProperties = openXmlElement.RunProperties;
+                                if (runProperties == null) continue;
                                 runProperties.FontSize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
                                 runProperties.Color = new Color() { Val = _designStandard.GetHeaderColor() };
                                 runProperties.Bold = new Bold() { Val = _designStandard.isBold() };
                                 runProperties.RunFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
                             }
                         }
-
                         if (isNeedChangeStyleForParagraph) SetParagraphStyle(para);
 
                     }
@@ -85,58 +81,66 @@ namespace ProcessDocumentCore.Processing
 
         private void SetParagraphStyle(Paragraph para)
         {
-            //задаем стили для параграфа, т.к. если в параграфе имеется нумерация, то стиль берется общий для параграфа
-            if (para.ParagraphProperties?.ParagraphMarkRunProperties != null)
+            try
             {
-                var fontSize = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
-                    x.GetType() == typeof(FontSize));
-                var color = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
-                    x.GetType() == typeof(Color));
-
-                var bold = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
-                    x.GetType() == typeof(Bold));
-
-                var runFonts = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
-                    x.GetType() == typeof(RunFonts));
-
-                if (fontSize != null)
+                //задаем стили для параграфа, т.к. если в параграфе имеется нумерация, то стиль берется общий для параграфа
+                if (para.ParagraphProperties?.ParagraphMarkRunProperties != null)
                 {
-                    var el = (FontSize)fontSize;
-                    el.Val = (_designStandard.GetFontSize() * 2).ToString();
-                }
-                else
-                {
-                    var _size = new FontSize { Val = (_designStandard.GetFontSize() * 2).ToString() };
-                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(_size);
-                }
+                    var fontSize = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
+                        x.GetType() == typeof(FontSize));
+                    var color = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
+                        x.GetType() == typeof(Color));
 
-                if (bold != null)
-                {
-                    var el = (Bold)bold;
-                    el.Val = _designStandard.isBold();
-                }
-                else
-                {
-                    var _bold = new Bold { Val = _designStandard.isBold() };
-                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(_bold);
-                }
+                    var bold = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
+                        x.GetType() == typeof(Bold));
 
-                runFonts?.Remove();
+                    var runFonts = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
+                        x.GetType() == typeof(RunFonts));
 
-                var _runFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
-                para.ParagraphProperties.ParagraphMarkRunProperties.Append(_runFonts);
+                    if (fontSize != null)
+                    {
+                        var el = (FontSize)fontSize;
+                        el.Val = (_designStandard.GetFontSize() * 2).ToString();
+                    }
+                    else
+                    {
+                        var _size = new FontSize { Val = (_designStandard.GetFontSize() * 2).ToString() };
+                        para.ParagraphProperties.ParagraphMarkRunProperties.Append(_size);
+                    }
 
-                if (color != null)
-                {
-                    var el = (Color)color;
-                    el.Val = "365F91";
-                }
-                else
-                {
-                    var _color = new Color { Val = _designStandard.GetHeaderColor() };
-                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(_color);
+                    if (bold != null)
+                    {
+                        var el = (Bold)bold;
+                        el.Val = _designStandard.isBold();
+                    }
+                    else
+                    {
+                        var _bold = new Bold { Val = _designStandard.isBold() };
+                        para.ParagraphProperties.ParagraphMarkRunProperties.Append(_bold);
+                    }
+
+                    runFonts?.Remove();
+
+                    var _runFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
+                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(_runFonts);
+
+                    if (color != null)
+                    {
+                        var el = (Color)color;
+                        el.Val = "365F91";
+                    }
+                    else
+                    {
+                        var _color = new Color { Val = _designStandard.GetHeaderColor() };
+                        para.ParagraphProperties.ParagraphMarkRunProperties.Append(_color);
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
         }
 
         private string GetPathToSaveObj()
