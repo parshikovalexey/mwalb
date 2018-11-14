@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace StandardsLibrary
 {
+
     public class GostTest:Standards
     {
         public override string GetFont()
@@ -23,10 +25,8 @@ namespace StandardsLibrary
             throw new NotImplementedException();
         }
 
-        public override string GetAlignment()
-        {
-            throw new NotImplementedException();
-        }
+        public override JustificationValues GetAlignment() => JustificationValues.Right;
+        
 
         public override int GetMarginLeft()
         {

@@ -6,15 +6,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace StandardsLibrary
 {
+    
     public class Gost1 : Standards
     {
         public string Font { get; set; }
         public int FontSize { get; set; }
         public float LineSpacing { get; set; }
-        public string Alignment { get; set; }
+        public JustificationValues Alignment { get; set; }
         public int MarginLeft { get; set; }
         public int MarginRight { get; set; }
         public int MarginTop { get; set; }
@@ -29,7 +31,7 @@ namespace StandardsLibrary
             Font = gost["Font"];
             FontSize = Int32.Parse(gost["FontSize"]);
             LineSpacing = Convert.ToSingle(gost["LineSpacing"], new CultureInfo("en-US"));
-            Alignment = gost["Alignment"];
+            Alignment = IsAligment(gost["Alignment"]);
             MarginLeft = Int32.Parse(gost["MarginLeft"]);
             MarginRight = Int32.Parse(gost["MarginRight"]);
             MarginTop = Int32.Parse(gost["MarginTop"]);
@@ -37,6 +39,21 @@ namespace StandardsLibrary
             HeaderColor = gost["HeaderColor"];
             Bold = bool.Parse(gost["Bold"]);
 
+        }
+
+        public JustificationValues IsAligment(string Aligment)
+        {
+            switch (Aligment)
+            {
+                case "center":
+                    return  JustificationValues.Center;
+                case "letf":
+                    return JustificationValues.Left;
+                case "right":
+                    return JustificationValues.Right;
+                default:
+                    return JustificationValues.Both;
+            }
         }
 
 
@@ -49,10 +66,8 @@ namespace StandardsLibrary
             throw new NotImplementedException();
         }
 
-        public override string GetAlignment()
-        {
-            throw new NotImplementedException();
-        }
+        public override JustificationValues GetAlignment() => Alignment;
+        
 
         public override int GetMarginLeft()
         {
@@ -79,3 +94,4 @@ namespace StandardsLibrary
         public override string GetHeaderColor() => HeaderColor;
     }
 }
+

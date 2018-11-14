@@ -24,7 +24,6 @@ namespace ProcessDocumentCore.Processing
             {
                 File.Copy(filePath, pathToSaveObj);
                 stream = File.Open(pathToSaveObj, FileMode.Open);
-
                 using (wordDoc = WordprocessingDocument.Open(stream, true))
                 {
                     string docText;
@@ -35,13 +34,15 @@ namespace ProcessDocumentCore.Processing
 
                     var body = wordDoc.MainDocumentPart.Document.Body;
                     var isHeader = false;
-
+                   
                     foreach (var para in body.Elements<Paragraph>())
                     {
+                        
                         bool isNeedChangeStyleForParagraph = false;
                         foreach (var itemPara in para)
                         {
-                            if (itemPara is BookmarkStart) isHeader = true;
+
+                            if (itemPara is BookmarkStart)  isHeader = true;
 
                             if (itemPara is BookmarkEnd) isHeader = false;
 
@@ -50,17 +51,56 @@ namespace ProcessDocumentCore.Processing
                                 //Определяем есть ли нумерованный список для задания стиля всему параграфу, т.к. на него распотсраняется отдельный стиль
                                 var hasNumberingProperties = para.ParagraphProperties.FirstOrDefault(o =>
                                     o.GetType() == typeof(NumberingProperties));
+
                                 if (hasNumberingProperties != null) isNeedChangeStyleForParagraph = true;
 
                                 RunProperties runProperties = run.RunProperties;
+
                                 runProperties.FontSize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
                                 runProperties.Color = new Color() { Val = _designStandard.GetHeaderColor() };
                                 runProperties.Bold = new Bold() { Val = _designStandard.isBold() };
                                 runProperties.RunFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
+
+                            }
+
+                            if (isHeader == false)
+                            {
+                                // Выранивание для текста
+                                var textAlignBody = para.ParagraphProperties.FirstOrDefault(x =>
+                                    x.GetType() == typeof(Justification));
+
+                                if (textAlignBody != null)
+                                {
+                                    var _el = (Justification)textAlignBody;
+                                    _el.Val = (_designStandard.GetAlignment());
+                                }
+                                else
+                                {
+                                    var _el = new Justification() { Val = _designStandard.GetAlignment() };
+                                    para.ParagraphProperties.Append(_el);
+                                }
+                            }
+                            else
+                            {
+                                // Определяем положение выравнивания для заголовков
+                                var textAlignHead = para.ParagraphProperties.FirstOrDefault(x =>
+                                x.GetType() == typeof(Justification));
+
+                                if (textAlignHead != null)
+                                {
+                                    var _el = (Justification)textAlignHead;
+                                    _el.Val = (_designStandard.GetAlignment());
+                                }
+                                else
+                                {
+                                    var _el = new Justification() { Val = _designStandard.GetAlignment() };
+                                    para.ParagraphProperties.Append(_el);
+                                }
                             }
                         }
 
-                        if (isNeedChangeStyleForParagraph) SetParagraphStyle(para);
+                        if (isNeedChangeStyleForParagraph)  SetParagraphStyle(para); 
+
 
                     }
 
@@ -82,12 +122,12 @@ namespace ProcessDocumentCore.Processing
             }
             return new ResultExecute().OnError("Что то не так");
         }
-
+       
         private void SetParagraphStyle(Paragraph para)
         {
             //задаем стили для параграфа, т.к. если в параграфе имеется нумерация, то стиль берется общий для параграфа
             if (para.ParagraphProperties?.ParagraphMarkRunProperties != null)
-            {
+            {              
                 var fontSize = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
                     x.GetType() == typeof(FontSize));
                 var color = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
@@ -98,7 +138,7 @@ namespace ProcessDocumentCore.Processing
 
                 var runFonts = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
                     x.GetType() == typeof(RunFonts));
-
+   
                 if (fontSize != null)
                 {
                     var el = (FontSize)fontSize;
