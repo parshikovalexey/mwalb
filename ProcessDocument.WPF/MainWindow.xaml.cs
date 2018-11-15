@@ -1,9 +1,11 @@
-﻿using CommonLibrary;
+﻿using System.IO;
+using CommonLibrary;
 using Microsoft.Win32;
 using ProcessDocumentCore;
 using ProcessDocumentCore.Processing;
 using StandardsLibrary;
 using System.Windows;
+using Newtonsoft.Json;
 
 namespace ProcessDocument.WPF
 {
@@ -38,10 +40,9 @@ namespace ProcessDocument.WPF
 
         private void FormatDocumet_Click(object sender, RoutedEventArgs e)
         {
-
             if (CheckInput()) return;
-            Standards gost = TestGostCheck.IsChecked != null && !(bool) TestGostCheck.IsChecked
-                ? (Standards) new Gost1(GostPath)
+            Standards gost = TestGostCheck.IsChecked != null && !(bool)TestGostCheck.IsChecked
+                ? (Standards) JsonConvert.DeserializeObject<Gost1>(File.ReadAllText(GostPath))
                 : new GostTest();
             _ = new Execute(FilePath, gost, new ProcessingOpenXml(), ResultDocument);
         }
@@ -77,7 +78,7 @@ namespace ProcessDocument.WPF
             {
                 System.Diagnostics.Process.Start(filePath);
             }
-           
+
         }
         private void LoadGostButton_Click(object sender, RoutedEventArgs e)
         {

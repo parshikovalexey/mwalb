@@ -109,6 +109,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\ParagraphStyles.cs" />
     <Compile Include="Processing\ProcessingOpenXml.cs" />
     <Compile Include="Execute.cs" />
     <Compile Include="Interface\IDocumentProcessing.cs" />

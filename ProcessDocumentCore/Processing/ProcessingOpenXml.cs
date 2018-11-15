@@ -6,6 +6,7 @@ using StandardsLibrary;
 using System;
 using System.IO;
 using System.Linq;
+using ProcessDocumentCore.Models;
 
 namespace ProcessDocumentCore.Processing
 {
@@ -25,8 +26,7 @@ namespace ProcessDocumentCore.Processing
                 File.Copy(filePath, pathToSaveObj);
                 stream = File.Open(pathToSaveObj, FileMode.Open);
 
-                using (wordDoc = WordprocessingDocument.Open(stream, true))
-                {
+                using (wordDoc = WordprocessingDocument.Open(stream, true)){
                     string docText;
                     using (StreamReader sr = new StreamReader(wordDoc.MainDocumentPart.GetStream()))
                     {
@@ -38,9 +38,9 @@ namespace ProcessDocumentCore.Processing
                     foreach (var para in body.Elements<Paragraph>())
                     {
                         bool isNeedChangeStyleForParagraph = false;
-                        if (para.ToList().Any(p => p is BookmarkStart) && para.ToList().Any(p => p is BookmarkEnd))
+                        if (para.Any(p => p is BookmarkStart) && para.Any(p => p is BookmarkEnd))
                         {
-                            foreach (var openXmlElement1 in para.ToList().Where(x => x is Run).ToList())
+                            foreach (var openXmlElement1 in para.Where(x => x is Run).ToList())
                             {
                                 var openXmlElement = (Run)openXmlElement1;
                                 //Определяем есть ли нумерованный список для задания стиля всему параграфу, т.к. на него распотсраняется отдельный стиль
@@ -50,10 +50,8 @@ namespace ProcessDocumentCore.Processing
 
                                 RunProperties runProperties = openXmlElement.RunProperties;
                                 if (runProperties == null) continue;
-                                runProperties.FontSize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
-                                runProperties.Color = new Color() { Val = _designStandard.GetHeaderColor() };
-                                runProperties.Bold = new Bold() { Val = _designStandard.isBold() };
-                                runProperties.RunFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
+                                var paragraphStyles = new ParagraphStyles(_designStandard);
+                                paragraphStyles.SetParagraphStylesForRunProperties(runProperties);
                             }
                         }
                         if (isNeedChangeStyleForParagraph) SetParagraphStyle(para);
@@ -76,71 +74,27 @@ namespace ProcessDocumentCore.Processing
                 stream?.Close();
                 return new ResultExecute().OnError(ex.Message);
             }
-            return new ResultExecute().OnError("Что то не так");
         }
 
-        private void SetParagraphStyle(Paragraph para)
-        {
-            try
-            {
+        private void SetParagraphStyle(Paragraph para) {
+            try {
                 //задаем стили для параграфа, т.к. если в параграфе имеется нумерация, то стиль берется общий для параграфа
-                if (para.ParagraphProperties?.ParagraphMarkRunProperties != null)
-                {
-                    var fontSize = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
-                        x.GetType() == typeof(FontSize));
-                    var color = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
-                        x.GetType() == typeof(Color));
+                if (para.ParagraphProperties?.ParagraphMarkRunProperties != null) {
 
-                    var bold = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
-                        x.GetType() == typeof(Bold));
-
-                    var runFonts = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
-                        x.GetType() == typeof(RunFonts));
-
-                    if (fontSize != null)
-                    {
-                        var el = (FontSize)fontSize;
-                        el.Val = (_designStandard.GetFontSize() * 2).ToString();
-                    }
-                    else
-                    {
-                        var _size = new FontSize { Val = (_designStandard.GetFontSize() * 2).ToString() };
-                        para.ParagraphProperties.ParagraphMarkRunProperties.Append(_size);
-                    }
-
-                    if (bold != null)
-                    {
-                        var el = (Bold)bold;
-                        el.Val = _designStandard.isBold();
-                    }
-                    else
-                    {
-                        var _bold = new Bold { Val = _designStandard.isBold() };
-                        para.ParagraphProperties.ParagraphMarkRunProperties.Append(_bold);
-                    }
-
-                    runFonts?.Remove();
-
-                    var _runFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
-                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(_runFonts);
-
-                    if (color != null)
-                    {
-                        var el = (Color)color;
-                        el.Val = "365F91";
-                    }
-                    else
-                    {
-                        var _color = new Color { Val = _designStandard.GetHeaderColor() };
-                        para.ParagraphProperties.ParagraphMarkRunProperties.Append(_color);
-                    }
+                    //Подгрузили стили
+                    var paragraphStyles = new ParagraphStyles(_designStandard);
+                    //Получили коллекцию элементов
+                    var openXmlElements = paragraphStyles.GetCollectionOfElements();
+                    //Убили лишнее из списка
+                    paragraphStyles.RemoveChildElementFromParagraph(para);
+                    //Добавили нашу коллекцию в стили параграфа
+                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(openXmlElements);
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-
         }
 
         private string GetPathToSaveObj()

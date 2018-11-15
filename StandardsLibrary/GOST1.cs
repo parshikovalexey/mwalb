@@ -7,10 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StandardsLibrary
-{
-    public class Gost1 : Standards
-    {
+namespace StandardsLibrary {
+    public class Gost1 : Standards {
         public string Font { get; set; }
         public int FontSize { get; set; }
         public float LineSpacing { get; set; }
@@ -22,55 +20,31 @@ namespace StandardsLibrary
         public string HeaderColor { get; set; }
         public bool Bold { get; set; }
 
-        public Gost1(string path)
-        {
-            Dictionary<string, string> gost =
-                JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(path));
-            Font = gost["Font"];
-            FontSize = Int32.Parse(gost["FontSize"]);
-            LineSpacing = Convert.ToSingle(gost["LineSpacing"], new CultureInfo("en-US"));
-            Alignment = gost["Alignment"];
-            MarginLeft = Int32.Parse(gost["MarginLeft"]);
-            MarginRight = Int32.Parse(gost["MarginRight"]);
-            MarginTop = Int32.Parse(gost["MarginTop"]);
-            MarginBottom = int.Parse(gost["MarginBottom"]);
-            HeaderColor = gost["HeaderColor"];
-            Bold = bool.Parse(gost["Bold"]);
-
-        }
-
-
         public override string GetFont() => Font;
 
         public override int GetFontSize() => FontSize;
 
-        public override float GetLineSpacing()
-        {
+        public override float GetLineSpacing() {
             throw new NotImplementedException();
         }
 
-        public override string GetAlignment()
-        {
+        public override string GetAlignment() {
             throw new NotImplementedException();
         }
 
-        public override int GetMarginLeft()
-        {
+        public override int GetMarginLeft() {
             throw new NotImplementedException();
         }
 
-        public override int GetMarginRight()
-        {
+        public override int GetMarginRight() {
             throw new NotImplementedException();
         }
 
-        public override int GetMarginTop()
-        {
+        public override int GetMarginTop() {
             throw new NotImplementedException();
         }
 
-        public override int GetMarginBottom()
-        {
+        public override int GetMarginBottom() {
             throw new NotImplementedException();
         }
 
