@@ -12,4 +12,7 @@
 /ProcessDocumentCore/bin
 /StandardsLibrary/obj
 /StandardsLibrary/bin
+/OpenXmlHelperLibrary/obj
+/OpenXmlHelperLibrary/bin
 /packages
+.vs

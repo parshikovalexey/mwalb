@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{04CA0EA8-22FD-484D-80B5-23FA8303EFEF}</ProjectGuid>
+    <ProjectGuid>{5F881F8B-2775-4895-ABD7-CCF414AC57E9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProcessDocumentCore</RootNamespace>
-    <AssemblyName>ProcessDocumentCore</AssemblyName>
+    <RootNamespace>OpenXmlHelperLibrary</RootNamespace>
+    <AssemblyName>OpenXmlHelperLibrary</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -37,16 +37,11 @@
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
     </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.5.10\lib\net45\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.AppContext, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.AppContext.4.3.0\lib\net46\System.AppContext.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Console, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Console.4.3.0\lib\net46\System.Console.dll</HintPath>
     </Reference>
@@ -96,8 +91,6 @@
     <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Security.Cryptography.X509Certificates.4.3.0\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
     </Reference>
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -109,41 +102,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Processing\ProcessingOpenXml.cs" />
-    <Compile Include="Execute.cs" />
-    <Compile Include="Interface\IDocumentProcessing.cs" />
+    <Compile Include="Extension.cs" />
+    <Compile Include="OpenXmlGenericRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CommonLibrary\CommonLibrary.csproj">
-      <Project>{75377f98-6805-43f1-b05f-3358fb1b7d27}</Project>
-      <Name>CommonLibrary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\HelperLibrary\HelperLibrary.csproj">
-      <Project>{ebe50f27-a25c-4baa-82d8-3f0d1c45f77f}</Project>
-      <Name>HelperLibrary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LoggerLibrary\LoggerLibrary.csproj">
-      <Project>{131d27db-f9d2-4456-9355-b849fa7726bf}</Project>
-      <Name>LoggerLibrary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OpenXmlHelperLibrary\OpenXmlHelperLibrary.csproj">
-      <Project>{5f881f8b-2775-4895-abd7-ccf414ac57e9}</Project>
-      <Name>OpenXmlHelperLibrary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\StandardsLibrary\StandardsLibrary.csproj">
-      <Project>{cad058b5-069c-4251-8520-b36446096ba2}</Project>
-      <Name>StandardsLibrary</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
-    <Content Include="NLog.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="NLog.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
