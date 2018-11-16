@@ -76,7 +76,6 @@ namespace ProcessDocumentCore.Processing
                 stream?.Close();
                 return new ResultExecute().OnError(ex.Message);
             }
-            return new ResultExecute().OnError("Что то не так");
         }
 
         private void SetParagraphStyle(Paragraph para)
