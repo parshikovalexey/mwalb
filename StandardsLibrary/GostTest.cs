@@ -37,6 +37,31 @@ namespace StandardsLibrary
             throw new NotImplementedException();
         }
 
+        public override float GetBeforeSpacing()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override float GetAfterSpacing()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override float GetFirstLineIndentation()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override float GetLeftIndentation()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override float GetRightIndentation()
+        {
+            throw new NotImplementedException();
+        }
+
         public override string GetAlignment()
         {
             throw new NotImplementedException();

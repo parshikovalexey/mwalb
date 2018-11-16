@@ -65,10 +65,58 @@ namespace ProcessDocumentCore.Processing
                                 runProperties.RunFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
 
                             }
+
+                            //Форматирование абзацев
+                            if (!para.ToList().Any(p => p is BookmarkStart) && !para.ToList().Any(p => p is BookmarkEnd) || (para.Elements<BookmarkStart>().All(p => p.Name == "_GoBack")))
+                            {
+                                foreach (var runs in para.Elements<Run>()) //Форматирование шрифта и его размера для каждого run'а
+                                {
+                                    if (runs.RunProperties == null) runs.RunProperties = new RunProperties();
+                                    runs.RunProperties.RunFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
+                                    runs.RunProperties.FontSize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
+                                }
+
+                                if (para.ParagraphProperties == null) para.ParagraphProperties = new ParagraphProperties();
+
+                                para.ParagraphProperties.SpacingBetweenLines = new SpacingBetweenLines() //Интервалы между строками и абзацами
+                                {
+                                    Line = (_designStandard.GetLineSpacing() * 240).ToString(),
+                                    Before = (_designStandard.GetBeforeSpacing() * 20).ToString(),
+                                    After = (_designStandard.GetAfterSpacing() * 20).ToString(),
+                                    BeforeAutoSpacing = new DocumentFormat.OpenXml.OnOffValue(false),
+                                    AfterAutoSpacing = new DocumentFormat.OpenXml.OnOffValue(false)
+                                };
+
+                                if (para.ParagraphProperties.ParagraphMarkRunProperties != null) //Тут форматируется шрифт знака абзаца
+                                {
+                                    var runfont = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(p => p is RunFonts);
+                                    var fontsize = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(p => p is FontSize);
+                                    runfont?.Remove(); 
+                                    runfont = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
+                                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(runfont);
+                                    fontsize?.Remove();
+                                    fontsize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
+                                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(fontsize);
+                                }
+                                else
+                                {
+                                    para.ParagraphProperties.ParagraphMarkRunProperties = new ParagraphMarkRunProperties();
+                                    var runfont = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
+                                    var fontsize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
+                                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(runfont);
+                                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(fontsize);
+                                }
+
+                                para.ParagraphProperties.Indentation = new Indentation() //Отступы
+                                {
+                                    FirstLine = ((int)(_designStandard.GetFirstLineIndentation() * 567)).ToString(),
+                                    Left = ((int)(_designStandard.GetLeftIndentation() * 567)).ToString(), 
+                                    Right = ((int)(_designStandard.GetRightIndentation() * 567)).ToString(),
+                                };
+                            }
                         }
 
                         if (isNeedChangeStyleForParagraph) SetParagraphStyle(para);
-
                     }
 
                     using (StreamWriter sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))

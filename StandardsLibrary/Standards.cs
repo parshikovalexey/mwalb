@@ -5,6 +5,11 @@
         public abstract string GetFont();
         public abstract int GetFontSize ();
         public abstract float GetLineSpacing ();
+        public abstract float GetBeforeSpacing();
+        public abstract float GetAfterSpacing();
+        public abstract float GetFirstLineIndentation();
+        public abstract float GetLeftIndentation();
+        public abstract float GetRightIndentation();
         public abstract string GetAlignment ();
         public abstract int GetMarginLeft ();
         public abstract int GetMarginRight ();
