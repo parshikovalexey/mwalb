@@ -45,20 +45,18 @@ namespace ProcessDocumentCore.Processing
                     foreach (var para in body.Elements<Paragraph>())
                     {
                         bool isNeedChangeStyleForParagraph = false;
-                        foreach (var itemPara in para)
+                        if (para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd))
                         {
-                            if (itemPara is BookmarkStart) isHeader = true;
-
-                            if (itemPara is BookmarkEnd) isHeader = false;
-
-                            if (itemPara is Run run && isHeader)
+                            foreach (var openXmlElement1 in para.ToList().Where(x => x is Run).ToList())
                             {
+                                var openXmlElement = (Run)openXmlElement1;
                                 //Определяем есть ли нумерованный список для задания стиля всему параграфу, т.к. на него распотсраняется отдельный стиль
                                 var hasNumberingProperties = para.ParagraphProperties.FirstOrDefault(o =>
                                     o.GetType() == typeof(NumberingProperties));
                                 if (hasNumberingProperties != null) isNeedChangeStyleForParagraph = true;
 
-                                RunProperties runProperties = run.RunProperties;
+                                RunProperties runProperties = openXmlElement.RunProperties;
+                                if (runProperties == null) continue;
                                 runProperties.FontSize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
                                 runProperties.Color = new Color() { Val = _designStandard.GetHeaderColor() };
                                 runProperties.Bold = new Bold() { Val = _designStandard.isBold() };
@@ -115,7 +113,6 @@ namespace ProcessDocumentCore.Processing
                                 };
                             }
                         }
-
                         if (isNeedChangeStyleForParagraph) SetParagraphStyle(para);
                     }
 
@@ -135,42 +132,7 @@ namespace ProcessDocumentCore.Processing
                 stream?.Close();
                 return new ResultExecute().OnError(ex.Message);
             }
-            return new ResultExecute().OnError("Что то не так");
         }
-
-        private void CorrectImage(Body body)
-        {
-            if (body == null) return;
-
-            var isNextRunIsHeaderImg = false;
-            IDictionary<object, string> style = new Dictionary<object, string>();
-            style.Add(typeof(FontSize), (_designStandard.GetFontSize() * 2).ToString());
-            style.Add(typeof(Bold), _designStandard.isBold().ToString());
-            style.Add(typeof(RunFonts), _designStandard.GetFont());
-            style.Add(typeof(Justification), JustificationValues.Center.ToString());
-            foreach (var item in body.Elements<Paragraph>())
-            {
-                if (isNextRunIsHeaderImg)
-                {
-                    foreach (var itemRun in item)
-                    {
-                        if (itemRun is Run run) SetRunStyle(run, style);
-                    }
-                    SetParagraphStyle(item, style);
-                    isNextRunIsHeaderImg = false;
-
-                }
-
-                var findDrawing = item.Any(f => f.ToList().Any(e => e is Drawing));
-                if (findDrawing)
-                {
-                    isNextRunIsHeaderImg = true;
-                    SetParagraphStyle(item, style);
-                }
-            }
-        }
-
-
         private void SetParagraphStyle(Paragraph para)//todo переправить на новую реализацию
         {
             //задаем стили для параграфа, т.к. если в параграфе имеется нумерация, то стиль берется общий для параграфа
@@ -217,12 +179,46 @@ namespace ProcessDocumentCore.Processing
                 if (color != null)
                 {
                     var el = (Color)color;
-                    el.Val = "365F91";
+                    el.Val = _designStandard.GetHeaderColor();
                 }
                 else
                 {
                     var _color = new Color { Val = _designStandard.GetHeaderColor() };
                     para.ParagraphProperties.ParagraphMarkRunProperties.Append(_color);
+                }
+            }
+        }
+
+
+
+        private void CorrectImage(Body body)
+        {
+            if (body == null) return;
+
+            var isNextRunIsHeaderImg = false;
+            IDictionary<object, string> style = new Dictionary<object, string>();
+            style.Add(typeof(FontSize), (_designStandard.GetFontSize() * 2).ToString());
+            style.Add(typeof(Bold), _designStandard.isBold().ToString());
+            style.Add(typeof(RunFonts), _designStandard.GetFont());
+            style.Add(typeof(Justification), JustificationValues.Center.ToString());
+            foreach (var item in body.Elements<Paragraph>())
+            {
+                if (isNextRunIsHeaderImg)
+                {
+                    foreach (var itemRun in item)
+                    {
+                        if (itemRun is Run run) SetRunStyle(run, style);
+                    }
+                    SetParagraphStyle(item, style);
+                    isNextRunIsHeaderImg = false;
+
+                }
+
+                var findDrawing = item.Any(f => f.ToList().Any(e => e is Drawing));
+                if (findDrawing)
+                {
+                    isNextRunIsHeaderImg = true;
+                    SetParagraphStyle(item, style);
                 }
             }
         }
