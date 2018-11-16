@@ -38,7 +38,7 @@ namespace ProcessDocumentCore.Processing
                     foreach (var para in body.Elements<Paragraph>())
                     {
                         bool isNeedChangeStyleForParagraph = false;
-                        if (para.ToList().Any(p => p is BookmarkStart) && para.ToList().Any(p => p is BookmarkEnd))
+                        if (para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd))
                         {
                             foreach (var openXmlElement1 in para.ToList().Where(x => x is Run).ToList())
                             {
