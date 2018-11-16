@@ -39,7 +39,7 @@ namespace ProcessDocumentCore.Processing
                     var body = wordDoc.MainDocumentPart.Document.Body;
 
 
-                    CorrectImage(body);
+                
                     var isHeader = false;
 
                     foreach (var para in body.Elements<Paragraph>())
@@ -164,6 +164,8 @@ namespace ProcessDocumentCore.Processing
                         }
                     }
 
+                    CorrectImage(body);
+
                     using (StreamWriter sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))
                     {
                         sw.Write(docText);
@@ -245,10 +247,10 @@ namespace ProcessDocumentCore.Processing
 
             var isNextRunIsHeaderImg = false;
             IDictionary<object, string> style = new Dictionary<object, string>();
-            style.Add(typeof(FontSize), (_designStandard.GetFontSize() * 2).ToString());
+            style.Add(typeof(FontSize), (_designStandard.GetFontSize()).ToString());
             style.Add(typeof(Bold), _designStandard.isBold().ToString());
             style.Add(typeof(RunFonts), _designStandard.GetFont());
-            style.Add(typeof(Justification), JustificationValues.Center.ToString());
+            style.Add(typeof(Justification), _designStandard.GetAlignment_Image());
             foreach (var item in body.Elements<Paragraph>())
             {
                 if (isNextRunIsHeaderImg)

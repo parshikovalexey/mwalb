@@ -11,6 +11,7 @@
         public abstract float GetLeftIndentation();
         public abstract float GetRightIndentation();
         public abstract string GetAlignment ();
+        public abstract string GetAlignment_Image ();
         public abstract int GetMarginLeft ();
         public abstract int GetMarginRight ();
         public abstract int GetMarginTop ();

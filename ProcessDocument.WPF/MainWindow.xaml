@@ -77,13 +77,13 @@
             <StackPanel>
                 <StackPanel Margin="5" Orientation="Horizontal">
                     <Button
-                        Width="103"
+                        Width="485"
                         Height="30"
                         Margin="5"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         Click="FormatDocumet_Click"
-                        Content="Форматировать" />
+                        Content="Форматировать и открыть" />
                     <TextBox
                         x:Name="ResultExecuteTextBox"
                         Width="372"
@@ -92,7 +92,8 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Center"
                         Text="Результат обработки"
-                        TextWrapping="Wrap" />
+                        TextWrapping="Wrap"
+                        Visibility="Collapsed" />
 
                 </StackPanel>
                 <Button
@@ -103,7 +104,8 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
                     Click="OpenDocument_Click"
-                    Content="Открыть" />
+                    Content="Открыть"
+                    Visibility="Collapsed" />
             </StackPanel>
 
         </GroupBox>

@@ -16,6 +16,7 @@ namespace OpenXmlHelperLibrary
                 case "center": return JustificationValues.Center;
                 case "left": return JustificationValues.Left;
                 case "right": return JustificationValues.Right;
+                case "both": return JustificationValues.Both;
             }
             return @default;
         }

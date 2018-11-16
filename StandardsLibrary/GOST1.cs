@@ -67,7 +67,11 @@ namespace StandardsLibrary
         public override float GetRightIndentation() => RightIndentation;
 
         public override string GetAlignment() => Alignment;
-        
+        public override string GetAlignment_Image()
+        {
+            throw new NotImplementedException();
+        }
+
         public override int GetMarginLeft()
         {
             throw new NotImplementedException();

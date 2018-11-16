@@ -11,13 +11,21 @@ namespace StandardsLibrary
 
         public string Font { get; set; } = "Times New Roman";
         public int FontSize { get; set; } = 30;
-        public float LineSpacing { get; set; }
-        public string Alignment { get; set; }
-        public int MarginLeft { get; set; }
-        public int MarginRight { get; set; }
-        public int MarginTop { get; set; }
-        public int MarginBottom { get; set; }
+        public string Alignment { get; set; } = "Both";
+        public string Alignment_Image { get; set; } = "Center";
+
+        public float LineSpacing { get; set; } = 1.5f;
+        public int MarginLeft { get; set; } = 0;
+        public int MarginRight { get; set; } = 0;
+        public int MarginTop { get; set; } = 0;
+        public int MarginBottom { get; set; } = 0;
         public string HeaderColor { get; set; } = "365F91";
+        public float BeforeSpacing { get; set; } = 1;
+        public float AfterSpacing { get; set; } = 1;
+        public float FirstLineIndentation { get; set; } = 1.5f;
+        public float LeftIndentation { get; set; } = 0;
+        public float RightIndentation { get; set; } = 0;
+      
         public bool Bold { get; set; } = true;
 
       
@@ -38,54 +46,58 @@ namespace StandardsLibrary
 
         public override float GetLineSpacing()
         {
-            throw new NotImplementedException();
+            return LineSpacing;
         }
 
         public override string GetAlignment() => Alignment;
-        
+        public override string GetAlignment_Image()
+        {
+            return Alignment_Image;
+        }
+
         public override float GetBeforeSpacing()
         {
-            throw new NotImplementedException();
+            return BeforeSpacing;
         }
 
         public override float GetAfterSpacing()
         {
-            throw new NotImplementedException();
+            return AfterSpacing;
         }
 
         public override float GetFirstLineIndentation()
         {
-            throw new NotImplementedException();
+            return FirstLineIndentation;
         }
 
         public override float GetLeftIndentation()
         {
-            throw new NotImplementedException();
+            return LeftIndentation;
         }
 
         public override float GetRightIndentation()
         {
-            throw new NotImplementedException();
+            return RightIndentation;
         }
 
         public override int GetMarginLeft()
         {
-            throw new NotImplementedException();
+            return MarginLeft;
         }
 
         public override int GetMarginRight()
         {
-            throw new NotImplementedException();
+            return MarginRight;
         }
 
         public override int GetMarginTop()
         {
-            throw new NotImplementedException();
+            return MarginTop;
         }
 
         public override int GetMarginBottom()
         {
-            throw new NotImplementedException();
+            return MarginBottom;
         }
 
         public override bool isBold()

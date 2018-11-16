@@ -65,8 +65,20 @@ namespace ProcessDocument.WPF
 
         private void ResultDocument(ResultExecute resultexecute)
         {
-            ResultExecuteTextBox.Text = resultexecute.ToString();
             returnStatusExecute = resultexecute;
+            if (resultexecute.StatusExecute == ResultExecute.Status.Success)
+            {
+                if (returnStatusExecute.Callbacks is string filePath)
+                {
+                    System.Diagnostics.Process.Start(filePath);
+                }
+            }
+            else
+            {
+                MessageBox.Show(resultexecute.ErrorMsg);
+            }
+            //ResultExecuteTextBox.Text = resultexecute.ToString();
+           
         }
 
         private ResultExecute returnStatusExecute { get; set; }
