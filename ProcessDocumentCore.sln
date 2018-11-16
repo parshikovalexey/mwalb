@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StandardsLibrary", "Standar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessDocument.WPF", "ProcessDocument.WPF\ProcessDocument.WPF.csproj", "{56ACB535-E054-4982-80F0-258648F7F1BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenXmlHelperLibrary", "OpenXmlHelperLibrary\OpenXmlHelperLibrary.csproj", "{5F881F8B-2775-4895-ABD7-CCF414AC57E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{56ACB535-E054-4982-80F0-258648F7F1BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56ACB535-E054-4982-80F0-258648F7F1BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56ACB535-E054-4982-80F0-258648F7F1BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F881F8B-2775-4895-ABD7-CCF414AC57E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F881F8B-2775-4895-ABD7-CCF414AC57E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F881F8B-2775-4895-ABD7-CCF414AC57E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F881F8B-2775-4895-ABD7-CCF414AC57E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

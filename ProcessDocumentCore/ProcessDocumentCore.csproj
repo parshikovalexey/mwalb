@@ -127,6 +127,10 @@
       <Project>{131d27db-f9d2-4456-9355-b849fa7726bf}</Project>
       <Name>LoggerLibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OpenXmlHelperLibrary\OpenXmlHelperLibrary.csproj">
+      <Project>{5f881f8b-2775-4895-abd7-ccf414ac57e9}</Project>
+      <Name>OpenXmlHelperLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\StandardsLibrary\StandardsLibrary.csproj">
       <Project>{cad058b5-069c-4251-8520-b36446096ba2}</Project>
       <Name>StandardsLibrary</Name>

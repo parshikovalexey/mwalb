@@ -21,7 +21,6 @@ namespace StandardsLibrary
         public int MarginBottom { get; set; }
         public string HeaderColor { get; set; }
         public bool Bold { get; set; }
-
         public Gost1(string path)
         {
             Dictionary<string, string> gost =
@@ -38,6 +37,7 @@ namespace StandardsLibrary
             Bold = bool.Parse(gost["Bold"]);
 
         }
+        
 
 
         public override string GetFont() => Font;
