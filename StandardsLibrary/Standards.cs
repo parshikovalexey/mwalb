@@ -1,13 +1,10 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-
-namespace StandardsLibrary
+﻿namespace StandardsLibrary
 {
     public abstract class Standards
     {
         public abstract string GetFont();
         public abstract int GetFontSize ();
         public abstract float GetLineSpacing ();
-        public abstract JustificationValues GetAlignment ();
         public abstract float GetBeforeSpacing();
         public abstract float GetAfterSpacing();
         public abstract float GetFirstLineIndentation();

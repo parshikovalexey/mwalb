@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace StandardsLibrary
 {
@@ -15,7 +14,6 @@ namespace StandardsLibrary
         public string Font { get; set; }
         public int FontSize { get; set; }
         public float LineSpacing { get; set; }
-        public JustificationValues Alignment { get; set; }
         public float BeforeSpacing { get; set; }
         public float AfterSpacing { get; set; }
         public float FirstLineIndentation { get; set; }
@@ -68,7 +66,7 @@ namespace StandardsLibrary
 
         public override float GetRightIndentation() => RightIndentation;
 
-        public override JustificationValues GetAlignment() => Alignment;
+        public override string GetAlignment() => Alignment;
         
         public override int GetMarginLeft()
         {

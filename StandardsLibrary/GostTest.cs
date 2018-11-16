@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace StandardsLibrary
 {
@@ -42,7 +41,7 @@ namespace StandardsLibrary
             throw new NotImplementedException();
         }
 
-        public override JustificationValues GetAlignment() => JustificationValues.Right;
+        public override string GetAlignment() => Alignment;
         
         public override float GetBeforeSpacing()
         {
@@ -65,11 +64,6 @@ namespace StandardsLibrary
         }
 
         public override float GetRightIndentation()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string GetAlignment()
         {
             throw new NotImplementedException();
         }

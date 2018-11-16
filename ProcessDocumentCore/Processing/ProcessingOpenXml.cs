@@ -125,11 +125,11 @@ namespace ProcessDocumentCore.Processing
                                 if (textAlignBody != null)
                                 {
                                     var _el = (Justification)textAlignBody;
-                                    _el.Val = (_designStandard.GetAlignment());
+                                    _el.Val = (Extension.GetJustificationByString(_designStandard.GetAlignment()));
                                 }
                                 else
                                 {
-                                    var _el = new Justification() { Val = _designStandard.GetAlignment() };
+                                    var _el = new Justification() { Val = Extension.GetJustificationByString(_designStandard.GetAlignment()) };
                                     para.ParagraphProperties.Append(_el);
                                 }
                             }
@@ -141,11 +141,11 @@ namespace ProcessDocumentCore.Processing
                                 if (textAlignHead != null)
                                 {
                                     var _el = (Justification)textAlignHead;
-                                    _el.Val = (_designStandard.GetAlignment());
+                                    _el.Val = (Extension.GetJustificationByString(_designStandard.GetAlignment()));
                                 }
                                 else
                                 {
-                                    var _el = new Justification() { Val = _designStandard.GetAlignment() };
+                                    var _el = new Justification() { Val = Extension.GetJustificationByString(_designStandard.GetAlignment()) };
                                     para.ParagraphProperties.Append(_el);
                                 }
                             }
