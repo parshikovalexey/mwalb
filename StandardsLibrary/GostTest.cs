@@ -7,7 +7,6 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace StandardsLibrary
 {
-
     public class GostTest:Standards
     {
         public override string GetFont()
@@ -27,7 +26,6 @@ namespace StandardsLibrary
 
         public override JustificationValues GetAlignment() => JustificationValues.Right;
         
-
         public override int GetMarginLeft()
         {
             throw new NotImplementedException();

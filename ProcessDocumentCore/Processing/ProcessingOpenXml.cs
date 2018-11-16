@@ -24,6 +24,7 @@ namespace ProcessDocumentCore.Processing
             {
                 File.Copy(filePath, pathToSaveObj);
                 stream = File.Open(pathToSaveObj, FileMode.Open);
+
                 using (wordDoc = WordprocessingDocument.Open(stream, true))
                 {
                     string docText;
@@ -51,16 +52,13 @@ namespace ProcessDocumentCore.Processing
                                 //Определяем есть ли нумерованный список для задания стиля всему параграфу, т.к. на него распотсраняется отдельный стиль
                                 var hasNumberingProperties = para.ParagraphProperties.FirstOrDefault(o =>
                                     o.GetType() == typeof(NumberingProperties));
-
                                 if (hasNumberingProperties != null) isNeedChangeStyleForParagraph = true;
 
                                 RunProperties runProperties = run.RunProperties;
-
                                 runProperties.FontSize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
                                 runProperties.Color = new Color() { Val = _designStandard.GetHeaderColor() };
                                 runProperties.Bold = new Bold() { Val = _designStandard.isBold() };
                                 runProperties.RunFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
-
                             }
 
                             if (isHeader == false)
@@ -68,7 +66,6 @@ namespace ProcessDocumentCore.Processing
                                 // Выранивание для текста
                                 var textAlignBody = para.ParagraphProperties.FirstOrDefault(x =>
                                     x.GetType() == typeof(Justification));
-
                                 if (textAlignBody != null)
                                 {
                                     var _el = (Justification)textAlignBody;
@@ -85,7 +82,6 @@ namespace ProcessDocumentCore.Processing
                                 // Определяем положение выравнивания для заголовков
                                 var textAlignHead = para.ParagraphProperties.FirstOrDefault(x =>
                                 x.GetType() == typeof(Justification));
-
                                 if (textAlignHead != null)
                                 {
                                     var _el = (Justification)textAlignHead;
@@ -100,8 +96,6 @@ namespace ProcessDocumentCore.Processing
                         }
 
                         if (isNeedChangeStyleForParagraph)  SetParagraphStyle(para); 
-
-
                     }
 
                     using (StreamWriter sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))

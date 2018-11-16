@@ -10,7 +10,6 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace StandardsLibrary
 {
-    
     public class Gost1 : Standards
     {
         public string Font { get; set; }
@@ -31,7 +30,7 @@ namespace StandardsLibrary
             Font = gost["Font"];
             FontSize = Int32.Parse(gost["FontSize"]);
             LineSpacing = Convert.ToSingle(gost["LineSpacing"], new CultureInfo("en-US"));
-            Alignment = IsAligment(gost["Alignment"]);
+            Alignment = gost["Alignment"]);
             MarginLeft = Int32.Parse(gost["MarginLeft"]);
             MarginRight = Int32.Parse(gost["MarginRight"]);
             MarginTop = Int32.Parse(gost["MarginTop"]);
@@ -40,23 +39,7 @@ namespace StandardsLibrary
             Bold = bool.Parse(gost["Bold"]);
 
         }
-
-        public JustificationValues IsAligment(string Aligment)
-        {
-            switch (Aligment)
-            {
-                case "center":
-                    return  JustificationValues.Center;
-                case "letf":
-                    return JustificationValues.Left;
-                case "right":
-                    return JustificationValues.Right;
-                default:
-                    return JustificationValues.Both;
-            }
-        }
-
-
+        
         public override string GetFont() => Font;
 
         public override int GetFontSize() => FontSize;
@@ -68,7 +51,6 @@ namespace StandardsLibrary
 
         public override JustificationValues GetAlignment() => Alignment;
         
-
         public override int GetMarginLeft()
         {
             throw new NotImplementedException();
