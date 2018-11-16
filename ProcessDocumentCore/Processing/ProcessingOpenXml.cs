@@ -2,13 +2,13 @@
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using HelperLibrary;
+using OpenXmlHelperLibrary;
 using ProcessDocumentCore.Interface;
 using StandardsLibrary;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using OpenXmlHelperLibrary;
 
 namespace ProcessDocumentCore.Processing
 {
@@ -41,26 +41,23 @@ namespace ProcessDocumentCore.Processing
 
                     CorrectImage(body);
                     var isHeader = false;
-                   
+
                     foreach (var para in body.Elements<Paragraph>())
                     {
-                        
+
                         bool isNeedChangeStyleForParagraph = false;
-                        foreach (var itemPara in para)
+                        if (para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd))
                         {
-
-                            if (itemPara is BookmarkStart)  isHeader = true;
-
-                            if (itemPara is BookmarkEnd) isHeader = false;
-
-                            if (itemPara is Run run && isHeader)
+                            foreach (var openXmlElement1 in para.ToList().Where(x => x is Run).ToList())
                             {
+                                var openXmlElement = (Run)openXmlElement1;
                                 //Определяем есть ли нумерованный список для задания стиля всему параграфу, т.к. на него распотсраняется отдельный стиль
                                 var hasNumberingProperties = para.ParagraphProperties.FirstOrDefault(o =>
                                     o.GetType() == typeof(NumberingProperties));
                                 if (hasNumberingProperties != null) isNeedChangeStyleForParagraph = true;
 
-                                RunProperties runProperties = run.RunProperties;
+                                RunProperties runProperties = openXmlElement.RunProperties;
+                                if (runProperties == null) continue;
                                 runProperties.FontSize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
                                 runProperties.Color = new Color() { Val = _designStandard.GetHeaderColor() };
                                 runProperties.Bold = new Bold() { Val = _designStandard.isBold() };
@@ -93,7 +90,7 @@ namespace ProcessDocumentCore.Processing
                                 {
                                     var runfont = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(p => p is RunFonts);
                                     var fontsize = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(p => p is FontSize);
-                                    runfont?.Remove(); 
+                                    runfont?.Remove();
                                     runfont = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
                                     para.ParagraphProperties.ParagraphMarkRunProperties.Append(runfont);
                                     fontsize?.Remove();
@@ -112,26 +109,30 @@ namespace ProcessDocumentCore.Processing
                                 para.ParagraphProperties.Indentation = new Indentation() //Отступы
                                 {
                                     FirstLine = ((int)(_designStandard.GetFirstLineIndentation() * 567)).ToString(),
-                                    Left = ((int)(_designStandard.GetLeftIndentation() * 567)).ToString(), 
+                                    Left = ((int)(_designStandard.GetLeftIndentation() * 567)).ToString(),
                                     Right = ((int)(_designStandard.GetRightIndentation() * 567)).ToString(),
                                 };
                             }
 
                             if (isHeader == false)
                             {
-                                // Выранивание для текста
-                                var textAlignBody = para.ParagraphProperties.FirstOrDefault(x =>
-                                    x.GetType() == typeof(Justification));
-                                if (textAlignBody != null)
-                                {
-                                    var _el = (Justification)textAlignBody;
-                                    _el.Val = (Extension.GetJustificationByString(_designStandard.GetAlignment()));
-                                }
-                                else
-                                {
-                                    var _el = new Justification() { Val = Extension.GetJustificationByString(_designStandard.GetAlignment()) };
-                                    para.ParagraphProperties.Append(_el);
-                                }
+                                //var p = new OpenXmlGenericRepository<Paragraph>(para);
+                                //p.ClearAll();
+                                //p.Justification(_designStandard.GetAlignment());
+
+                                //// Выранивание для текста
+                                //var textAlignBody = para.ParagraphProperties.FirstOrDefault(x =>
+                                //    x.GetType() == typeof(Justification));
+                                //if (textAlignBody != null)
+                                //{
+                                //    var _el = (Justification)textAlignBody;
+                                //    _el.Val = (Extension.GetJustificationByString(_designStandard.GetAlignment()));
+                                //}
+                                //else
+                                //{
+                                //    var _el = new Justification() { Val = Extension.GetJustificationByString(_designStandard.GetAlignment()) };
+                                //    para.ParagraphProperties.Append(_el);
+                                //}
                             }
                             else
                             {
@@ -151,7 +152,16 @@ namespace ProcessDocumentCore.Processing
                             }
                         }
 
-                        if (isNeedChangeStyleForParagraph)  SetParagraphStyle(para); 
+                        if (isNeedChangeStyleForParagraph)
+                        {
+                            SetParagraphStyle(para);
+                        }
+                        else
+                        {
+                            var p = new OpenXmlGenericRepository<Paragraph>(para);
+                            p.ClearAll();
+                            p.Justification(_designStandard.GetAlignment());
+                        }
                     }
 
                     using (StreamWriter sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))
@@ -170,47 +180,12 @@ namespace ProcessDocumentCore.Processing
                 stream?.Close();
                 return new ResultExecute().OnError(ex.Message);
             }
-            return new ResultExecute().OnError("Что то не так");
         }
-
-        private void CorrectImage(Body body)
-        {
-            if (body == null) return;
-
-            var isNextRunIsHeaderImg = false;
-            IDictionary<object, string> style = new Dictionary<object, string>();
-            style.Add(typeof(FontSize), (_designStandard.GetFontSize() * 2).ToString());
-            style.Add(typeof(Bold), _designStandard.isBold().ToString());
-            style.Add(typeof(RunFonts), _designStandard.GetFont());
-            style.Add(typeof(Justification), JustificationValues.Center.ToString());
-            foreach (var item in body.Elements<Paragraph>())
-            {
-                if (isNextRunIsHeaderImg)
-                {
-                    foreach (var itemRun in item)
-                    {
-                        if (itemRun is Run run) SetRunStyle(run, style);
-                    }
-                    SetParagraphStyle(item, style);
-                    isNextRunIsHeaderImg = false;
-
-                }
-
-                var findDrawing = item.Any(f => f.ToList().Any(e => e is Drawing));
-                if (findDrawing)
-                {
-                    isNextRunIsHeaderImg = true;
-                    SetParagraphStyle(item, style);
-                }
-            }
-        }
-
-
         private void SetParagraphStyle(Paragraph para)//todo переправить на новую реализацию
         {
             //задаем стили для параграфа, т.к. если в параграфе имеется нумерация, то стиль берется общий для параграфа
             if (para.ParagraphProperties?.ParagraphMarkRunProperties != null)
-            {              
+            {
                 var fontSize = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
                     x.GetType() == typeof(FontSize));
                 var color = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
@@ -221,7 +196,7 @@ namespace ProcessDocumentCore.Processing
 
                 var runFonts = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(x =>
                     x.GetType() == typeof(RunFonts));
-   
+
                 if (fontSize != null)
                 {
                     var el = (FontSize)fontSize;
@@ -252,12 +227,46 @@ namespace ProcessDocumentCore.Processing
                 if (color != null)
                 {
                     var el = (Color)color;
-                    el.Val = "365F91";
+                    el.Val = _designStandard.GetHeaderColor();
                 }
                 else
                 {
                     var _color = new Color { Val = _designStandard.GetHeaderColor() };
                     para.ParagraphProperties.ParagraphMarkRunProperties.Append(_color);
+                }
+            }
+        }
+
+
+
+        private void CorrectImage(Body body)
+        {
+            if (body == null) return;
+
+            var isNextRunIsHeaderImg = false;
+            IDictionary<object, string> style = new Dictionary<object, string>();
+            style.Add(typeof(FontSize), (_designStandard.GetFontSize() * 2).ToString());
+            style.Add(typeof(Bold), _designStandard.isBold().ToString());
+            style.Add(typeof(RunFonts), _designStandard.GetFont());
+            style.Add(typeof(Justification), JustificationValues.Center.ToString());
+            foreach (var item in body.Elements<Paragraph>())
+            {
+                if (isNextRunIsHeaderImg)
+                {
+                    foreach (var itemRun in item)
+                    {
+                        if (itemRun is Run run) SetRunStyle(run, style);
+                    }
+                    SetParagraphStyle(item, style);
+                    isNextRunIsHeaderImg = false;
+
+                }
+
+                var findDrawing = item.Any(f => f.ToList().Any(e => e is Drawing));
+                if (findDrawing)
+                {
+                    isNextRunIsHeaderImg = true;
+                    SetParagraphStyle(item, style);
                 }
             }
         }
@@ -372,6 +381,6 @@ namespace ProcessDocumentCore.Processing
             return @default;
         }
 
-       
+
     }
 }
