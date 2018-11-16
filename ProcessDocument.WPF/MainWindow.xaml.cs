@@ -48,7 +48,7 @@ namespace ProcessDocument.WPF
 
         private bool CheckInput()
         {
-            if (string.IsNullOrEmpty(GostPath))
+            if (string.IsNullOrEmpty(GostPath) && TestGostCheck.IsChecked == false)
             {
                 MessageBox.Show("Гост не выбран!");
                 return true;
