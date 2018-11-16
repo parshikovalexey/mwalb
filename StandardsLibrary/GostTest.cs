@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace StandardsLibrary
 {
@@ -37,6 +41,8 @@ namespace StandardsLibrary
             throw new NotImplementedException();
         }
 
+        public override string GetAlignment() => Alignment;
+        
         public override float GetBeforeSpacing()
         {
             throw new NotImplementedException();
@@ -58,11 +64,6 @@ namespace StandardsLibrary
         }
 
         public override float GetRightIndentation()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string GetAlignment()
         {
             throw new NotImplementedException();
         }

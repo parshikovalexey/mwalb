@@ -66,11 +66,8 @@ namespace StandardsLibrary
 
         public override float GetRightIndentation() => RightIndentation;
 
-        public override string GetAlignment()
-        {
-            throw new NotImplementedException();
-        }
-
+        public override string GetAlignment() => Alignment;
+        
         public override int GetMarginLeft()
         {
             throw new NotImplementedException();
@@ -96,3 +93,4 @@ namespace StandardsLibrary
         public override string GetHeaderColor() => HeaderColor;
     }
 }
+
