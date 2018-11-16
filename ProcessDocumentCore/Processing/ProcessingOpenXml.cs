@@ -76,7 +76,6 @@ namespace ProcessDocumentCore.Processing
                 stream?.Close();
                 return new ResultExecute().OnError(ex.Message);
             }
-            return new ResultExecute().OnError("Что то не так");
         }
 
         private void SetParagraphStyle(Paragraph para)
@@ -127,7 +126,7 @@ namespace ProcessDocumentCore.Processing
                     if (color != null)
                     {
                         var el = (Color)color;
-                        el.Val = "365F91";
+                        el.Val = _designStandard.GetHeaderColor();
                     }
                     else
                     {
