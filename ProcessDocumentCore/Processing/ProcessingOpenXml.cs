@@ -126,7 +126,7 @@ namespace ProcessDocumentCore.Processing
                     if (color != null)
                     {
                         var el = (Color)color;
-                        el.Val = "365F91";
+                        el.Val = _designStandard.GetHeaderColor();
                     }
                     else
                     {
