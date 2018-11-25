@@ -11,7 +11,7 @@ namespace StandardsLibrary
 
         public string Font { get; set; } = "Times New Roman";
         public int FontSize { get; set; } = 30;
-        public string Alignment { get; set; } = "Both";
+        public string Alignment { get; set; } = "center";
         public string Alignment_Image { get; set; } = "Center";
 
         public float LineSpacing { get; set; } = 1.5f;

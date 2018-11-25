@@ -39,8 +39,6 @@ namespace ProcessDocumentCore.Processing
                     var body = wordDoc.MainDocumentPart.Document.Body;
 
 
-                
-                    var isHeader = false;
 
                     foreach (var para in body.Elements<Paragraph>())
                     {
@@ -54,6 +52,7 @@ namespace ProcessDocumentCore.Processing
                                 //Определяем есть ли нумерованный список для задания стиля всему параграфу, т.к. на него распотсраняется отдельный стиль
                                 var hasNumberingProperties = para.ParagraphProperties.FirstOrDefault(o =>
                                     o.GetType() == typeof(NumberingProperties));
+                                
                                 if (hasNumberingProperties != null) isNeedChangeStyleForParagraph = true;
 
                                 RunProperties runProperties = openXmlElement.RunProperties;
@@ -65,91 +64,55 @@ namespace ProcessDocumentCore.Processing
 
                             }
 
-                            //Форматирование абзацев
-                            if (!para.ToList().Any(p => p is BookmarkStart) && !para.ToList().Any(p => p is BookmarkEnd) || (para.Elements<BookmarkStart>().All(p => p.Name == "_GoBack")))
+
+                        }//Форматирование абзацев
+                        if (!para.ToList().Any(p => p is BookmarkStart) && !para.ToList().Any(p => p is BookmarkEnd) || (para.Elements<BookmarkStart>().All(p => p.Name == "_GoBack")))
+                        {
+                            foreach (var runs in para.Elements<Run>()) //Форматирование шрифта и его размера для каждого run'а
                             {
-                                foreach (var runs in para.Elements<Run>()) //Форматирование шрифта и его размера для каждого run'а
-                                {
-                                    if (runs.RunProperties == null) runs.RunProperties = new RunProperties();
-                                    runs.RunProperties.RunFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
-                                    runs.RunProperties.FontSize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
-                                }
-
-                                if (para.ParagraphProperties == null) para.ParagraphProperties = new ParagraphProperties();
-
-                                para.ParagraphProperties.SpacingBetweenLines = new SpacingBetweenLines() //Интервалы между строками и абзацами
-                                {
-                                    Line = (_designStandard.GetLineSpacing() * 240).ToString(),
-                                    Before = (_designStandard.GetBeforeSpacing() * 20).ToString(),
-                                    After = (_designStandard.GetAfterSpacing() * 20).ToString(),
-                                    BeforeAutoSpacing = new DocumentFormat.OpenXml.OnOffValue(false),
-                                    AfterAutoSpacing = new DocumentFormat.OpenXml.OnOffValue(false)
-                                };
-
-                                if (para.ParagraphProperties.ParagraphMarkRunProperties != null) //Тут форматируется шрифт знака абзаца
-                                {
-                                    var runfont = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(p => p is RunFonts);
-                                    var fontsize = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(p => p is FontSize);
-                                    runfont?.Remove();
-                                    runfont = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
-                                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(runfont);
-                                    fontsize?.Remove();
-                                    fontsize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
-                                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(fontsize);
-                                }
-                                else
-                                {
-                                    para.ParagraphProperties.ParagraphMarkRunProperties = new ParagraphMarkRunProperties();
-                                    var runfont = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
-                                    var fontsize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
-                                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(runfont);
-                                    para.ParagraphProperties.ParagraphMarkRunProperties.Append(fontsize);
-                                }
-
-                                para.ParagraphProperties.Indentation = new Indentation() //Отступы
-                                {
-                                    FirstLine = ((int)(_designStandard.GetFirstLineIndentation() * 567)).ToString(),
-                                    Left = ((int)(_designStandard.GetLeftIndentation() * 567)).ToString(),
-                                    Right = ((int)(_designStandard.GetRightIndentation() * 567)).ToString(),
-                                };
+                                if (runs.RunProperties == null) runs.RunProperties = new RunProperties();
+                                runs.RunProperties.RunFonts = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
+                                runs.RunProperties.FontSize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
                             }
 
-                            if (isHeader == false)
-                            {
-                                //var p = new OpenXmlGenericRepository<Paragraph>(para);
-                                //p.ClearAll();
-                                //p.Justification(_designStandard.GetAlignment());
+                            if (para.ParagraphProperties == null) para.ParagraphProperties = new ParagraphProperties();
 
-                                //// Выранивание для текста
-                                //var textAlignBody = para.ParagraphProperties.FirstOrDefault(x =>
-                                //    x.GetType() == typeof(Justification));
-                                //if (textAlignBody != null)
-                                //{
-                                //    var _el = (Justification)textAlignBody;
-                                //    _el.Val = (Extension.GetJustificationByString(_designStandard.GetAlignment()));
-                                //}
-                                //else
-                                //{
-                                //    var _el = new Justification() { Val = Extension.GetJustificationByString(_designStandard.GetAlignment()) };
-                                //    para.ParagraphProperties.Append(_el);
-                                //}
+                            para.ParagraphProperties.SpacingBetweenLines = new SpacingBetweenLines() //Интервалы между строками и абзацами
+                            {
+                                Line = (_designStandard.GetLineSpacing() * 240).ToString(),
+                                Before = (_designStandard.GetBeforeSpacing() * 20).ToString(),
+                                After = (_designStandard.GetAfterSpacing() * 20).ToString(),
+                                BeforeAutoSpacing = new DocumentFormat.OpenXml.OnOffValue(false),
+                                AfterAutoSpacing = new DocumentFormat.OpenXml.OnOffValue(false)
+                            };
+
+                            if (para.ParagraphProperties.ParagraphMarkRunProperties != null) //Тут форматируется шрифт знака абзаца
+                            {
+                                var runfont = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(p => p is RunFonts);
+                                var fontsize = para.ParagraphProperties.ParagraphMarkRunProperties.ChildElements.FirstOrDefault(p => p is FontSize);
+                                runfont?.Remove();
+                                runfont = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
+                                para.ParagraphProperties.ParagraphMarkRunProperties.Append(runfont);
+                                fontsize?.Remove();
+                                fontsize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
+                                para.ParagraphProperties.ParagraphMarkRunProperties.Append(fontsize);
                             }
                             else
                             {
-                                // Определяем положение выравнивания для заголовков
-                                var textAlignHead = para.ParagraphProperties.FirstOrDefault(x =>
-                                x.GetType() == typeof(Justification));
-                                if (textAlignHead != null)
-                                {
-                                    var _el = (Justification)textAlignHead;
-                                    _el.Val = (Extension.GetJustificationByString(_designStandard.GetAlignment()));
-                                }
-                                else
-                                {
-                                    var _el = new Justification() { Val = Extension.GetJustificationByString(_designStandard.GetAlignment()) };
-                                    para.ParagraphProperties.Append(_el);
-                                }
+                                para.ParagraphProperties.ParagraphMarkRunProperties = new ParagraphMarkRunProperties();
+                                var runfont = new RunFonts() { Ascii = _designStandard.GetFont(), HighAnsi = _designStandard.GetFont() };
+                                var fontsize = new FontSize() { Val = (_designStandard.GetFontSize() * 2).ToString() };
+                                para.ParagraphProperties.ParagraphMarkRunProperties.Append(runfont);
+                                para.ParagraphProperties.ParagraphMarkRunProperties.Append(fontsize);
                             }
+
+                            para.ParagraphProperties.Indentation = new Indentation() //Отступы
+                            {
+                                FirstLine = ((int)(_designStandard.GetFirstLineIndentation() * 567)).ToString(),
+                                Left = ((int)(_designStandard.GetLeftIndentation() * 567)).ToString(),
+                                Right = ((int)(_designStandard.GetRightIndentation() * 567)).ToString(),
+                            };
+
                         }
 
                         if (isNeedChangeStyleForParagraph)
@@ -185,6 +148,10 @@ namespace ProcessDocumentCore.Processing
         }
         private void SetParagraphStyle(Paragraph para)//todo переправить на новую реализацию
         {
+            //Выравнивание для заголовка с нумерацией 
+            var p = new OpenXmlGenericRepository<Paragraph>(para);
+            p.ClearAll();
+            p.Justification(_designStandard.GetAlignment());
             //задаем стили для параграфа, т.к. если в параграфе имеется нумерация, то стиль берется общий для параграфа
             if (para.ParagraphProperties?.ParagraphMarkRunProperties != null)
             {
