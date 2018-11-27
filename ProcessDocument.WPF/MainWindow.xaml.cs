@@ -1,20 +1,61 @@
-﻿using CommonLibrary;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using CommonLibrary;
 using Microsoft.Win32;
 using ProcessDocumentCore;
 using ProcessDocumentCore.Processing;
 using StandardsLibrary;
 using System.Windows;
+using StandardsLibrary.Simple;
 
 namespace ProcessDocument.WPF
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        GostService _gostRepository = new GostService();
+        private List<SimpleHeaderGost> _gosts;
+        private SimpleHeaderGost _selectGost;
+
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
+            Gosts = new List<SimpleHeaderGost>();
+            _gostRepository.LoadGostFromFile();
+            loadGosts();
+        }
+
+        private void loadGosts()
+        {
+            Gosts = _gostRepository.GetGostList();
+        }
+
+        public List<SimpleHeaderGost> Gosts
+        {
+            get => _gosts;
+            set { _gosts = value; NotifyPropertyChanged("Gosts"); }
+        }
+
+        public SimpleHeaderGost SelectGost
+        {
+            get => _selectGost;
+            set
+            {
+                _selectGost = value;
+                NotifyPropertyChanged("SelectGost");
+            }
         }
 
         private string FilePath {
@@ -40,6 +81,8 @@ namespace ProcessDocument.WPF
         {
 
             if (CheckInput()) return;
+          var selectedGost =   _gostRepository.GetGostModel(SelectGost.GuidGost);
+            var d = new GostGenericRepository<GostModel>(selectedGost);
             Standards gost = TestGostCheck.IsChecked != null && !(bool) TestGostCheck.IsChecked
                 ? (Standards) new Gost1(GostPath)
                 : new GostTest();

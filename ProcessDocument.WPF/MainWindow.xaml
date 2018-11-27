@@ -12,7 +12,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="76" />
-            <RowDefinition Height="90" />
+            <RowDefinition Height="130" />
             <RowDefinition Height="120" />
         </Grid.RowDefinitions>
         <GroupBox Grid.Row="0" Header="Загрузить документ *.docx">
@@ -68,7 +68,12 @@
                         VerticalAlignment="Center"
                         Click="LoadGostButton_Click"
                         Content="Выбрать" />
+
                 </StackPanel>
+                <ComboBox
+                    DisplayMemberPath="Header"
+                    ItemsSource="{Binding Gosts}"
+                    SelectedItem="{Binding SelectGost}" />
             </StackPanel>
 
         </GroupBox>

@@ -16,8 +16,9 @@ namespace ProcessDocumentCore.Processing
     {
         private Standards _designStandard;
         private const string ExtensionDoc = ".docx";
-        public ResultExecute Processing(Standards designStandard, string filePath)
+        public ResultExecute Processing(Standards designStandard, string filePath, GostModel gostModel)
         {
+            _gostRepository = new GostGenericRepository<GostModel>(gostModel);
             _designStandard = designStandard;
             PathHelper.ClearTmpDirectory();
             Stream stream = null;
@@ -39,7 +40,7 @@ namespace ProcessDocumentCore.Processing
                     var body = wordDoc.MainDocumentPart.Document.Body;
 
 
-                
+
                     var isHeader = false;
 
                     foreach (var para in body.Elements<Paragraph>())
@@ -183,6 +184,17 @@ namespace ProcessDocumentCore.Processing
                 return new ResultExecute().OnError(ex.Message);
             }
         }
+
+
+        private GostGenericRepository<GostModel> _gostRepository;
+
+        public ResultExecute Processing(GostModel designStandard, string filePath)
+        {
+
+
+            return new ResultExecute();
+        }
+
         private void SetParagraphStyle(Paragraph para)//todo переправить на новую реализацию
         {
             //задаем стили для параграфа, т.к. если в параграфе имеется нумерация, то стиль берется общий для параграфа
@@ -323,6 +335,21 @@ namespace ProcessDocumentCore.Processing
                 //t.Append(newStyle);
             }
         }
+
+        private void SetParagraphStyle(Paragraph para, CommonGost.StyleTypeEnum typeStyle)
+        {
+
+            if (para == null) return;
+
+            var p = new OpenXmlGenericRepository<Paragraph>(para);
+            p.ClearAll();
+            if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
+            if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
+            if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
+            if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
+            if (_gostRepository.GetAlignment(typeStyle) != null) p.Justification(_gostRepository.GetAlignment(typeStyle));
+        }
+
         private void SetRunStyle(Run run, IDictionary<object, string> styleDictionary)
         {
             if (run == null) return;
