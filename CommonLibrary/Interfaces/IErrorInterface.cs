@@ -2,7 +2,7 @@
 
 namespace CommonLibrary.Interfaces
 {
- public   interface IErrorInterface
+    public interface IErrorInterface
     {
         event Action<ResultExecute> Errors;
     }

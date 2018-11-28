@@ -24,7 +24,7 @@ namespace ProcessDocument.WPF
             }
         }
 
-        GostService _gostRepository = new GostService();
+        GostService _gostService = new GostService();
         private List<SimpleHeaderGost> _gosts;
         private SimpleHeaderGost _selectGost;
 
@@ -33,13 +33,13 @@ namespace ProcessDocument.WPF
             InitializeComponent();
             DataContext = this;
             Gosts = new List<SimpleHeaderGost>();
-            _gostRepository.LoadGostFromFile();
+            _gostService.LoadGostFromFile();
             loadGosts();
         }
 
         private void loadGosts()
         {
-            Gosts = _gostRepository.GetGostList();
+            Gosts = _gostService.GetGostList();
         }
 
         public List<SimpleHeaderGost> Gosts
@@ -81,7 +81,7 @@ namespace ProcessDocument.WPF
         {
 
             if (CheckInput()) return;
-          var selectedGost =   _gostRepository.GetGostModel(SelectGost.GuidGost);
+          var selectedGost =   _gostService.GetGostModel(SelectGost.GuidGost);
             var d = new GostGenericRepository<GostModel>(selectedGost);
             Standards gost = TestGostCheck.IsChecked != null && !(bool) TestGostCheck.IsChecked
                 ? (Standards) new Gost1(GostPath)

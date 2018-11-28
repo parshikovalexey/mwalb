@@ -11,6 +11,5 @@ namespace ProcessDocumentCore.Interface
     public interface IDocumentProcessing
     {
         ResultExecute Processing(Standards designStandard, string filePath, GostModel gostModel);
-        ResultExecute Processing(GostModel designStandard, string filePath);
     }
 }

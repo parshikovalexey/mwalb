@@ -188,12 +188,6 @@ namespace ProcessDocumentCore.Processing
 
         private GostGenericRepository<GostModel> _gostRepository;
 
-        public ResultExecute Processing(GostModel designStandard, string filePath)
-        {
-
-
-            return new ResultExecute();
-        }
 
         private void SetParagraphStyle(Paragraph para)//todo переправить на новую реализацию
         {
