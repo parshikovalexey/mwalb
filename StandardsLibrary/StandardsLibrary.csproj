@@ -42,10 +42,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonGost.cs" />
     <Compile Include="Gost1.cs" />
+    <Compile Include="GostGenericRepository.cs" />
+    <Compile Include="GostModel.cs" />
+    <Compile Include="GostService.cs" />
     <Compile Include="GostTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Simple\SimpleGost.cs" />
+    <Compile Include="Simple\SimpleHeaderGost.cs" />
+    <Compile Include="Simple\SimpleStyle.cs" />
     <Compile Include="Standards.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CommonLibrary\CommonLibrary.csproj">
+      <Project>{75377f98-6805-43f1-b05f-3358fb1b7d27}</Project>
+      <Name>CommonLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HelperLibrary\HelperLibrary.csproj">
+      <Project>{ebe50f27-a25c-4baa-82d8-3f0d1c45f77f}</Project>
+      <Name>HelperLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

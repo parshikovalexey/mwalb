@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace CommonLibrary
 {
@@ -14,6 +16,13 @@ namespace CommonLibrary
                 return true;
             }
             return exist;
+        }
+
+        public static ICollection<string> GetAllFiles(string rootDirectory, string fileExtension)
+        {
+            DirectoryInfo directory = new DirectoryInfo(rootDirectory);//Assuming Test is your Folder
+            var files = directory.GetFiles($"*.{fileExtension}"); //Getting Text files
+            return files.Select(f => f.Name).ToList();
         }
 
         public static void FileDelete(string path)
@@ -62,11 +71,11 @@ namespace CommonLibrary
 
         }
 
-
+        public static string GetBaseDirectory => AppDomain.CurrentDomain.BaseDirectory;
 
         public static string TmpDirectory()
         {
-            var tmp = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tmp"));
+            var tmp = Path.GetFullPath(Path.Combine(GetBaseDirectory, "tmp"));
             return DirectoryExists(tmp, true) ? tmp : String.Empty;
         }
 
