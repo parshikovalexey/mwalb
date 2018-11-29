@@ -76,6 +76,82 @@ namespace OpenXmlHelperLibrary
             //AddStyleToProperties(newStyle);
         }
 
+        public void LineSpacing(string line)
+        {
+            var spacing = new SpacingBetweenLines()
+            {
+                Line = line
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.SpacingBetweenLines == null)
+                _paragraph.ParagraphProperties.Append(spacing);
+            else _paragraph.ParagraphProperties.SpacingBetweenLines = spacing;
+        }
+
+        public void BeforeSpacing(string before)
+        {
+            var spacing = new SpacingBetweenLines()
+            {
+                Before = before
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.SpacingBetweenLines == null)
+                _paragraph.ParagraphProperties.Append(spacing);
+            else _paragraph.ParagraphProperties.SpacingBetweenLines = spacing;
+        }
+
+        public void AfterSpacing(string after)
+        {
+            var spacing = new SpacingBetweenLines()
+            {
+                After = after
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.SpacingBetweenLines == null)
+                _paragraph.ParagraphProperties.Append(spacing);
+            else _paragraph.ParagraphProperties.SpacingBetweenLines = spacing;
+        }
+
+        public void FirstLineIndent(string firstline)
+        {
+            var indent = new Indentation()
+            {
+                FirstLine = firstline
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.Indentation == null)
+                _paragraph.ParagraphProperties.Append(indent);
+            else _paragraph.ParagraphProperties.Indentation = indent;
+        }
+        public void LeftIndent(string left)
+        {
+            var indent = new Indentation()
+            {
+                Left = left
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.Indentation == null)
+                _paragraph.ParagraphProperties.Append(indent);
+            else _paragraph.ParagraphProperties.Indentation = indent;
+        }
+        public void RightIndent(string right)
+        {
+            var indent = new Indentation()
+            {
+                Right = right
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.Indentation == null)
+                _paragraph.ParagraphProperties.Append(indent);
+            else _paragraph.ParagraphProperties.Indentation = indent;
+        }
+
         private void AddStyleToMarkRunProperties(IEnumerable<OpenXmlElement> obj)
         {
             try
