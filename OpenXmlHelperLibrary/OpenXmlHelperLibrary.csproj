@@ -103,7 +103,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extension.cs" />
-    <Compile Include="OpenXmlGenericRepository.cs" />
+    <Compile Include="OpenXmlGenericRepositoryRun.cs" />
+    <Compile Include="OpenXmlGenericRepositoryParagraph.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -18,7 +18,7 @@ namespace ProcessDocumentCore
         /// <param name="resultDocumentInterface">Интерфейс возвращает результат обработки</param>
         /// <param name="designStandard">стандарт ГОСТ</param>
         /// <param name="filePath">Путь до файла для обработки</param>
-        public Execute(string filePath, Standards designStandard, IDocumentProcessing documentProcessing, AddPreparedDocumentInterface resultDocumentInterface )
+        public Execute(string filePath, GostModel gostModel, IDocumentProcessing documentProcessing, AddPreparedDocumentInterface resultDocumentInterface )
         {
             this.PreparedDocument = resultDocumentInterface;
             if (string.IsNullOrEmpty(filePath))
@@ -39,7 +39,7 @@ namespace ProcessDocumentCore
             }
             
             //передаем данные на форматирование
-            OnResponsePreparedDocument(documentProcessing.Processing(designStandard, filePath));
+            OnResponsePreparedDocument(documentProcessing.Processing(gostModel, filePath));
 
             //OnResponsePreparedDocument(new ResultExecute(){Callbacks = filePath});
         }

@@ -37,8 +37,7 @@ namespace StandardsLibrary
             Gosts = new List<SimpleGost>();
             if (PathHelper.DirectoryExists(_folderGostFile, false))
             {
-                List<string> files = new List<string>();
-                PathHelper.GetAllFiles(_folderGostFile, "*.json", files);
+                ICollection<string> files = PathHelper.GetAllFiles(_folderGostFile, "*.json");
                 foreach (var item in files)
                 {
                     try

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace CommonLibrary
 {
@@ -17,15 +18,12 @@ namespace CommonLibrary
             return exist;
         }
 
-        public static void GetAllFiles(string rootDirectory, string fileExtension, List<string> files)
+        public static ICollection<string> GetAllFiles(string rootDirectory, string fileExtension)
         {
-            string[] directories = Directory.GetDirectories(rootDirectory);
-            files.AddRange(Directory.GetFiles(rootDirectory, fileExtension));
-
-            foreach (string path in directories)
-                GetAllFiles(path, fileExtension, files);
+            DirectoryInfo directory = new DirectoryInfo(rootDirectory);//Assuming Test is your Folder
+            var files = directory.GetFiles($"*.{fileExtension}"); //Getting Text files
+            return files.Select(f => f.Name).ToList();
         }
-
 
         public static void FileDelete(string path)
         {
