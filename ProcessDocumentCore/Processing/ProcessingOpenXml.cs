@@ -251,7 +251,7 @@ namespace ProcessDocumentCore.Processing
             style.Add(typeof(Bold), _designStandard.isBold().ToString());
             style.Add(typeof(RunFonts), _designStandard.GetFont());
             style.Add(typeof(Justification), _designStandard.GetAlignment_Image());
-            foreach (var item in body.Elements<Paragraph>())
+            foreach (var item in body.Elements<Paragraph>().ToList())
             {
                 if (isNextRunIsHeaderImg)
                 {
@@ -262,6 +262,12 @@ namespace ProcessDocumentCore.Processing
                     SetParagraphStyle(item, style);
                     isNextRunIsHeaderImg = false;
 
+                    if (!item.Any(r => r.GetType() == typeof(Run)))
+                    {
+                        item.Remove();
+                        isNextRunIsHeaderImg = true;
+                        continue;
+                    }
                 }
 
                 var findDrawing = item.Any(f => f.ToList().Any(e => e is Drawing));
