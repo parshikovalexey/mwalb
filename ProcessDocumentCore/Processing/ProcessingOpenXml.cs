@@ -15,7 +15,6 @@ namespace ProcessDocumentCore.Processing
     public class ProcessingOpenXml : IDocumentProcessing
     {
         private const string ExtensionDoc = ".docx";
-        public ResultExecute Processing(GostModel gostModel, string filePath)
         {
             _gostRepository = new GostGenericRepository<GostModel>(gostModel);
             PathHelper.ClearTmpDirectory();
@@ -122,6 +121,27 @@ namespace ProcessDocumentCore.Processing
                             }
                         }
 
+                        //Форматирование абзацев
+                        if (para.Elements<BookmarkStart>().All(p => p.Name == "_GoBack") || !para.ToList().Any(p => p is BookmarkStart))
+                        {
+                            IDictionary<object, string> style = new Dictionary<object, string>();
+                            style.Add(typeof(FontSize), (_designStandard.GetFontSize() * 2).ToString());
+                            style.Add(typeof(RunFonts), _designStandard.GetFont());
+                            style.Add("lineSpacing", (_designStandard.GetLineSpacing()*240).ToString());
+                            style.Add("beforeSpacing", (_designStandard.GetBeforeSpacing() * 20).ToString());
+                            style.Add("afterSpacing", (_designStandard.GetAfterSpacing() * 20).ToString());
+                            style.Add("firstlineIndent", ((int)(_designStandard.GetFirstLineIndentation() * 567)).ToString());
+                            style.Add("leftIndent", ((int)(_designStandard.GetLeftIndentation() * 567)).ToString());
+                            style.Add("rightIndent", ((int)(_designStandard.GetRightIndentation() * 567)).ToString());
+
+                            foreach (var runs in para.Elements<Run>()) //Форматирование шрифта и его размера для каждого run'а
+                            {
+                                SetRunStyle(runs, style);
+                            }
+
+                            SetParagraphStyle(para, style);
+                        }
+
                         if (isNeedChangeStyleForParagraph)
                         {
                             SetParagraphStyle(para, CommonGost.StyleTypeEnum.Headline);
@@ -130,7 +150,7 @@ namespace ProcessDocumentCore.Processing
                         else
                         {
                             var p = new OpenXmlGenericRepositoryParagraph<Paragraph>(para);
-                            p.ClearAll();
+                            //p.ClearAll();
                             p.Justification(_gostRepository.GetAlignment(CommonGost.StyleTypeEnum.GlobalText));
                         }
                     }
@@ -305,6 +325,32 @@ namespace ProcessDocumentCore.Processing
                 //if (t == null) return;
                 //var newStyle = new Justification { Val = styleDictionary.GetVolStyle(typeof(Justification)).GetJustificationByString() };
                 //t.Append(newStyle);
+            }
+
+            if (styleDictionary.ContainsKey("lineSpacing"))
+            {
+                p.LineSpacing(styleDictionary.GetVolStyle("lineSpacing"));
+            }
+            if (styleDictionary.ContainsKey("beforeSpacing"))
+            {
+                p.BeforeSpacing(styleDictionary.GetVolStyle("beforeSpacing"));
+            }
+            if (styleDictionary.ContainsKey("afterSpacing"))
+            {
+                p.AfterSpacing(styleDictionary.GetVolStyle("afterSpacing"));
+            }
+
+            if (styleDictionary.ContainsKey("firstlineIndent"))
+            {
+                p.FirstLineIndent(styleDictionary.GetVolStyle("firstlineIndent"));
+            }
+            if (styleDictionary.ContainsKey("leftIndent"))
+            {
+                p.LeftIndent(styleDictionary.GetVolStyle("leftIndent"));
+            }
+            if (styleDictionary.ContainsKey("rightIndent"))
+            {
+                p.RightIndent(styleDictionary.GetVolStyle("rightIndent"));
             }
         }
 
