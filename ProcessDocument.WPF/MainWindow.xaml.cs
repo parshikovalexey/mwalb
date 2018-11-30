@@ -140,5 +140,12 @@ namespace ProcessDocument.WPF
         {
             StackPanelLoadGost.IsEnabled = TestGostCheck.IsChecked == null || !(bool)TestGostCheck.IsChecked;
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            _gostService.LoadGostFromFile();
+            loadGosts();
+            SelectGost = null;
+        }
     }
 }

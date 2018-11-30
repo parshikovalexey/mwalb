@@ -22,7 +22,7 @@ namespace CommonLibrary
         {
             DirectoryInfo directory = new DirectoryInfo(rootDirectory);//Assuming Test is your Folder
             var files = directory.GetFiles($"*.{fileExtension}"); //Getting Text files
-            return files.Select(f => f.Name).ToList();
+            return files.Select(f => f.FullName).ToList();
         }
 
         public static void FileDelete(string path)

@@ -26,6 +26,8 @@ namespace OpenXmlHelperLibrary
             }
         }
 
+        
+
         public void FontSize(int size)
         {
             ClearSingleStyleFromMarkRunProperties(typeof(FontSize));
@@ -35,10 +37,14 @@ namespace OpenXmlHelperLibrary
 
         public void Color(string color)
         {
+
             if (string.IsNullOrEmpty(color)) return;
-            ClearSingleStyleFromMarkRunProperties(typeof(Color));
-            var newStyle = new Color { Val = color };
-            AddStyleToMarkRunProperties(newStyle);
+            var newColor = new Color { Val = color };
+            _run?.RunProperties.Append(newColor);
+
+            //ClearSingleStyleFromMarkRunProperties(typeof(Color));
+            //var newStyle = new Color { Val = color };
+            //AddStyleToMarkRunProperties(newStyle);
         }
 
         public void Bold(bool bold)
