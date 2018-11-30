@@ -39,10 +39,23 @@ namespace OpenXmlHelperLibrary
 
         public void Color(string color)
         {
+
             if (string.IsNullOrEmpty(color)) return;
+          
             ClearSingleStyleFromMarkRunProperties(typeof(Color));
-            var newStyle = new Color { Val = color };
-            AddStyleToMarkRunProperties(newStyle);
+            var _color = new Color { Val = color };
+            _paragraph.ParagraphProperties.ParagraphMarkRunProperties.Append(_color);
+            //var t = _paragraph.ParagraphProperties.ParagraphMarkRunProperties;
+            //if (t == null) return;
+            //var newStyle = new Color { Val = color };
+            ////AddStyleToProperties(newStyle);
+            //t.Append(newStyle);
+
+
+            //if (string.IsNullOrEmpty(color)) return;
+            //ClearSingleStyleFromMarkRunProperties(typeof(Color));
+            //var newStyle = new Color { Val = color };
+            //AddStyleToMarkRunProperties(newStyle);
         }
 
         public void Bold(bool bold)

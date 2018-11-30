@@ -38,18 +38,20 @@
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Grid.Row="1" Header="Загрузить ГОСТ">
+        <GroupBox Grid.Row="1" Header="Выбрать ГОСТ">
             <StackPanel>
                 <CheckBox
                     x:Name="TestGostCheck"
                     Margin="10,5"
                     Checked="ToggleButton_OnCheckedTest"
                     Content="Тестовый гост. Шрифт: 30, Times New Roman, Bold, Color: 365F91"
-                    Unchecked="ToggleButton_OnCheckedTest" />
+                    Unchecked="ToggleButton_OnCheckedTest"
+                    Visibility="Collapsed" />
                 <StackPanel
                     x:Name="StackPanelLoadGost"
                     Margin="5"
-                    Orientation="Horizontal">
+                    Orientation="Horizontal"
+                    Visibility="Collapsed">
                     <TextBox
                         x:Name="GostFilePathTextBox"
                         Height="30"
@@ -71,9 +73,11 @@
 
                 </StackPanel>
                 <ComboBox
+                    Margin="10"
                     DisplayMemberPath="Header"
                     ItemsSource="{Binding Gosts}"
                     SelectedItem="{Binding SelectGost}" />
+                <Button Margin="10" Content="Обновить" Click="Button_Click" />
             </StackPanel>
 
         </GroupBox>
