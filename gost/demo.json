@@ -1,0 +1,53 @@
+{
+  "Header": "Тестовый гост",
+  "GlobalText": {
+    "Font": "Times New Roman",
+    "FontSize": 15,
+    "LineSpacing": 1.5,
+    "BeforeSpacing": 1.0,
+    "AfterSpacing": 1.0,
+    "FirstLineIndentation": 1.5,
+    "LeftIndentation": 0.0,
+    "RightIndentation": 0.0,
+    "Alignment": "Both",
+    "MarginLeft": 0,
+    "MarginRight": 0,
+    "MarginTop": 0,
+    "MarginBottom": 0,
+    "Bold": false
+  },
+  "Image": {
+    "Font": "Times New Roman",
+    "FontSize": 30,
+    "LineSpacing": 1.5,
+    "BeforeSpacing": 1.0,
+    "AfterSpacing": 1.0,
+    "FirstLineIndentation": 1.5,
+    "LeftIndentation": 0.0,
+    "RightIndentation": 0.0,
+    "Alignment": "Center",
+    "MarginLeft": 0,
+    "MarginRight": 0,
+    "MarginTop": 0,
+    "MarginBottom": 0,
+    "Color": null,
+    "Bold": true
+  },
+  "Headline": {
+    "Font": "Times New Roman",
+    "FontSize": 30,
+    "LineSpacing": 1.5,
+    "BeforeSpacing": 1.0,
+    "AfterSpacing": 1.0,
+    "FirstLineIndentation": 1.5,
+    "LeftIndentation": 0.0,
+    "RightIndentation": 0.0,
+    "Alignment": "Center",
+    "MarginLeft": 0,
+    "MarginRight": 0,
+    "MarginTop": 0,
+    "MarginBottom": 0,
+    "Color": "365F91",
+    "Bold": true
+  }
+}

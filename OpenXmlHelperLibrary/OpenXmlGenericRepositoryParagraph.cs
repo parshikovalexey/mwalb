@@ -7,10 +7,10 @@ using System.Linq;
 namespace OpenXmlHelperLibrary
 
 {
-    public class OpenXmlGenericRepository<T> where T : Paragraph
+    public class OpenXmlGenericRepositoryParagraph<T> where T : Paragraph
     {
         private readonly Paragraph _paragraph;
-        public OpenXmlGenericRepository(Paragraph paragraph)
+        public OpenXmlGenericRepositoryParagraph(Paragraph paragraph)
         {
             _paragraph = paragraph;
             if (paragraph == null) return;
@@ -39,10 +39,23 @@ namespace OpenXmlHelperLibrary
 
         public void Color(string color)
         {
+
             if (string.IsNullOrEmpty(color)) return;
+          
             ClearSingleStyleFromMarkRunProperties(typeof(Color));
-            var newStyle = new Color { Val = color };
-            AddStyleToMarkRunProperties(newStyle);
+            var _color = new Color { Val = color };
+            _paragraph.ParagraphProperties.ParagraphMarkRunProperties.Append(_color);
+            //var t = _paragraph.ParagraphProperties.ParagraphMarkRunProperties;
+            //if (t == null) return;
+            //var newStyle = new Color { Val = color };
+            ////AddStyleToProperties(newStyle);
+            //t.Append(newStyle);
+
+
+            //if (string.IsNullOrEmpty(color)) return;
+            //ClearSingleStyleFromMarkRunProperties(typeof(Color));
+            //var newStyle = new Color { Val = color };
+            //AddStyleToMarkRunProperties(newStyle);
         }
 
         public void Bold(bool bold)
@@ -60,11 +73,37 @@ namespace OpenXmlHelperLibrary
             AddStyleToMarkRunProperties(newStyle);
         }
 
+        public void SpacingBetweenLines(float lineSpacing, float beforeSpacing, float afterSpacing)
+        {
+            ClearSingleStyleFromMarkRunProperties(typeof(SpacingBetweenLines));
+            var newStyle = new SpacingBetweenLines() //Интервалы между строками и абзацами
+            {
+                Line = (lineSpacing * 240).ToString(),
+                Before = (beforeSpacing * 20).ToString(),
+                After = (afterSpacing * 20).ToString(),
+                BeforeAutoSpacing = new OnOffValue(false),
+                AfterAutoSpacing = new OnOffValue(false)
+            };
+            AddStyleToMarkRunProperties(newStyle);
+        }
+
+        public void Indentation(float firstLineIndentation, float leftIndentation, float rightIndentation)
+        {
+            ClearSingleStyleFromMarkRunProperties(typeof(Indentation));
+            var newStyle = new Indentation() //Отступы
+            {
+                FirstLine = (firstLineIndentation * 567).ToString(),
+                Left = (leftIndentation * 567).ToString(),
+                Right = (rightIndentation * 567).ToString(),
+            };
+            AddStyleToMarkRunProperties(newStyle);
+        }
+
         public void Justification(string justification) //todo Неизведанная магия! при отправке в метод AddStyleToProperties выравнивание не добавляется к стили
         {
             if (string.IsNullOrEmpty(justification)) return;
             ClearSingleStyleFromProperties(typeof(Justification));
-          
+
             var t = _paragraph.ParagraphProperties;
             if (t == null) return;
             var newStyle = new Justification { Val = justification.GetJustificationByString() };
@@ -74,6 +113,82 @@ namespace OpenXmlHelperLibrary
 
             //var newStyle = new Justification() { Val = justification.GetJustificationByString() };
             //AddStyleToProperties(newStyle);
+        }
+
+        public void LineSpacing(string line)
+        {
+            var spacing = new SpacingBetweenLines()
+            {
+                Line = line
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.SpacingBetweenLines == null)
+                _paragraph.ParagraphProperties.Append(spacing);
+            else _paragraph.ParagraphProperties.SpacingBetweenLines = spacing;
+        }
+
+        public void BeforeSpacing(string before)
+        {
+            var spacing = new SpacingBetweenLines()
+            {
+                Before = before
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.SpacingBetweenLines == null)
+                _paragraph.ParagraphProperties.Append(spacing);
+            else _paragraph.ParagraphProperties.SpacingBetweenLines = spacing;
+        }
+
+        public void AfterSpacing(string after)
+        {
+            var spacing = new SpacingBetweenLines()
+            {
+                After = after
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.SpacingBetweenLines == null)
+                _paragraph.ParagraphProperties.Append(spacing);
+            else _paragraph.ParagraphProperties.SpacingBetweenLines = spacing;
+        }
+
+        public void FirstLineIndent(string firstline)
+        {
+            var indent = new Indentation()
+            {
+                FirstLine = firstline
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.Indentation == null)
+                _paragraph.ParagraphProperties.Append(indent);
+            else _paragraph.ParagraphProperties.Indentation = indent;
+        }
+        public void LeftIndent(string left)
+        {
+            var indent = new Indentation()
+            {
+                Left = left
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.Indentation == null)
+                _paragraph.ParagraphProperties.Append(indent);
+            else _paragraph.ParagraphProperties.Indentation = indent;
+        }
+        public void RightIndent(string right)
+        {
+            var indent = new Indentation()
+            {
+                Right = right
+            };
+
+            //AddStyleToProperties(spacing);
+            if (_paragraph.ParagraphProperties.Indentation == null)
+                _paragraph.ParagraphProperties.Append(indent);
+            else _paragraph.ParagraphProperties.Indentation = indent;
         }
 
         private void AddStyleToMarkRunProperties(IEnumerable<OpenXmlElement> obj)

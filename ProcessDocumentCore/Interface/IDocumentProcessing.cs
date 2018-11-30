@@ -10,6 +10,6 @@ namespace ProcessDocumentCore.Interface
 {
     public interface IDocumentProcessing
     {
-        ResultExecute Processing(Standards designStandard, string filePath);
+        ResultExecute Processing(GostModel gostModel, string filePath);
     }
 }
