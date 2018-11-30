@@ -235,7 +235,7 @@ namespace ProcessDocumentCore.Processing
 
             var isNextRunIsHeaderImg = false;
           
-            foreach (var item in body.Elements<Paragraph>())
+            foreach (var item in body.Elements<Paragraph>().ToList())
             {
                 if (isNextRunIsHeaderImg)
                 {
@@ -246,6 +246,12 @@ namespace ProcessDocumentCore.Processing
                     SetParagraphStyle(item, CommonGost.StyleTypeEnum.Image);
                     isNextRunIsHeaderImg = false;
 
+                    if (!item.Any(r => r.GetType() == typeof(Run)))
+                    {
+                        item.Remove();
+                        isNextRunIsHeaderImg = true;
+                        continue;
+                    }
                 }
 
                 var findDrawing = item.Any(f => f.ToList().Any(e => e is Drawing));
