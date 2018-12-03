@@ -62,7 +62,7 @@ namespace OpenXmlHelperLibrary
             AddStyleToMarkRunProperties(newStyle);
         }
 
-        private void AddStyleToMarkRunProperties(IEnumerable<OpenXmlElement> obj)
+        private void AddStyleToMarkRunProperties(OpenXmlElement obj)
         {
             try
             {

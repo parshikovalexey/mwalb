@@ -38,6 +38,7 @@ namespace ProcessDocumentCore.Processing
                     }
 
                     var body = wordDoc.MainDocumentPart.Document.Body;
+                    var syle = wordDoc.MainDocumentPart.Document;
 
                     var isHeader = false;
 

@@ -79,7 +79,7 @@ namespace ProcessDocument.WPF
 
             if (CheckInput()) return;
             var selectedGost = _gostService.GetGostModel(SelectGost.GuidGost);
-            _ = new Execute(FilePath, selectedGost,  new ProcessingOpenXml(), ResultDocument); 
+            _ = new Execute(FilePath, selectedGost, new ProcessingOpenXml(), ResultDocument);
         }
 
         private bool CheckInput()
