@@ -44,7 +44,8 @@ namespace OpenXmlHelperLibrary
           
             ClearSingleStyleFromMarkRunProperties(typeof(Color));
             var _color = new Color { Val = color };
-            _paragraph.ParagraphProperties.ParagraphMarkRunProperties.Append(_color);
+            AddStyleToMarkRunProperties(_color);
+            //_paragraph.ParagraphProperties.ParagraphMarkRunProperties.Append(_color);
             //var t = _paragraph.ParagraphProperties.ParagraphMarkRunProperties;
             //if (t == null) return;
             //var newStyle = new Color { Val = color };
@@ -55,7 +56,7 @@ namespace OpenXmlHelperLibrary
             //if (string.IsNullOrEmpty(color)) return;
             //ClearSingleStyleFromMarkRunProperties(typeof(Color));
             //var newStyle = new Color { Val = color };
-            //AddStyleToMarkRunProperties(newStyle);
+            //
         }
 
         public void Bold(bool bold)
@@ -104,11 +105,12 @@ namespace OpenXmlHelperLibrary
             if (string.IsNullOrEmpty(justification)) return;
             ClearSingleStyleFromProperties(typeof(Justification));
 
-            var t = _paragraph.ParagraphProperties;
-            if (t == null) return;
+            //var t = _paragraph.ParagraphProperties;
+            //if (t == null) return;
             var newStyle = new Justification { Val = justification.GetJustificationByString() };
+            AddStyleToProperties(newStyle);
             //AddStyleToProperties(newStyle);
-            t.Append(newStyle);
+            //t.Append(newStyle);
 
 
             //var newStyle = new Justification() { Val = justification.GetJustificationByString() };
@@ -191,7 +193,7 @@ namespace OpenXmlHelperLibrary
             else _paragraph.ParagraphProperties.Indentation = indent;
         }
 
-        private void AddStyleToMarkRunProperties(IEnumerable<OpenXmlElement> obj)
+        private void AddStyleToMarkRunProperties(OpenXmlElement obj)
         {
             try
             {
@@ -204,7 +206,7 @@ namespace OpenXmlHelperLibrary
             }
 
         }
-        private void AddStyleToProperties(IEnumerable<OpenXmlElement> obj)
+        private void AddStyleToProperties(OpenXmlElement obj)
         {
             try
             {
