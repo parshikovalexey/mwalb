@@ -85,7 +85,7 @@ namespace OpenXmlHelperLibrary
                 BeforeAutoSpacing = new OnOffValue(false),
                 AfterAutoSpacing = new OnOffValue(false)
             };
-            AddStyleToMarkRunProperties(newStyle);
+            AddStyleToProperties(newStyle);
         }
 
         public void Indentation(float firstLineIndentation, float leftIndentation, float rightIndentation)
@@ -93,11 +93,11 @@ namespace OpenXmlHelperLibrary
             ClearSingleStyleFromMarkRunProperties(typeof(Indentation));
             var newStyle = new Indentation() //Отступы
             {
-                FirstLine = (firstLineIndentation * 567).ToString(),
-                Left = (leftIndentation * 567).ToString(),
-                Right = (rightIndentation * 567).ToString(),
+                FirstLine = ((int)(firstLineIndentation * 567)).ToString(),
+                Left = ((int)(leftIndentation * 567)).ToString(),
+                Right = ((int)(rightIndentation * 567)).ToString(),
             };
-            AddStyleToMarkRunProperties(newStyle);
+            AddStyleToProperties(newStyle);
         }
 
         public void Justification(string justification) //todo Неизведанная магия! при отправке в метод AddStyleToProperties выравнивание не добавляется к стили
