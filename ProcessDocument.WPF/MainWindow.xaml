@@ -77,7 +77,10 @@
                     DisplayMemberPath="Header"
                     ItemsSource="{Binding Gosts}"
                     SelectedItem="{Binding SelectGost}" />
-                <Button Margin="10" Content="Обновить" Click="Button_Click" />
+                <Button
+                    Margin="10"
+                    Click="Button_Click"
+                    Content="Обновить" />
             </StackPanel>
 
         </GroupBox>

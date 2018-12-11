@@ -53,12 +53,20 @@ namespace OpenXmlHelperLibrary
             var newStyle = new Bold { Val = bold };
             AddStyleToMarkRunProperties(newStyle);
         }
-        public void RunFonts(string ascii, string highAnsi)
+
+        /// <summary>
+        /// Задаем шрифт для текста
+        /// </summary>
+        /// <param name="ascii">для символов в диапазоне Unicode (U + 0000-U + 007F)</param>
+        /// <param name="highAnsi">для символов в сложном наборе Unicode, например. Арабский текст.</param>
+        /// <param name="complexScript">для символов в диапазоне Unicode, который не относится к одной из других категорий.</param>
+        public void RunFonts(string ascii, string highAnsi, string complexScript)
         {
             ClearSingleStyleFromMarkRunProperties(typeof(RunFonts));
             var newStyle = new RunFonts();
             if (!string.IsNullOrEmpty(ascii)) newStyle.Ascii = ascii;
-            if (!string.IsNullOrEmpty(highAnsi)) newStyle.Ascii = highAnsi;
+            if (!string.IsNullOrEmpty(highAnsi)) newStyle.HighAnsi = highAnsi;
+            if (!string.IsNullOrEmpty(complexScript)) newStyle.ComplexScript = complexScript;
             AddStyleToMarkRunProperties(newStyle);
         }
 
