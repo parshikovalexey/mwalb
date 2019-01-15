@@ -93,7 +93,7 @@ namespace OpenXmlHelperLibrary
             ClearSingleStyleFromMarkRunProperties(typeof(Indentation));
             var newStyle = new Indentation() //Отступы
             {
-                FirstLine = ((int)(firstLineIndentation * 567)).ToString(),
+                FirstLine = ((int)(firstLineIndentation * 567 - leftIndentation * 567)).ToString(),
                 Left = ((int)(leftIndentation * 567)).ToString(),
                 Right = ((int)(rightIndentation * 567)).ToString(),
             };
