@@ -26,7 +26,6 @@ namespace OpenXmlHelperLibrary
             }
         }
 
-        
 
         public void FontSize(int size)
         {
@@ -51,6 +50,20 @@ namespace OpenXmlHelperLibrary
         {
             ClearSingleStyleFromMarkRunProperties(typeof(Bold));
             var newStyle = new Bold { Val = bold };
+            AddStyleToMarkRunProperties(newStyle);
+        }
+
+        public void Italic(bool bold)
+        {
+            ClearSingleStyleFromMarkRunProperties(typeof(Italic));
+            var newStyle = new Italic { Val = bold };
+            AddStyleToMarkRunProperties(newStyle);
+        }
+
+        public void Underline(bool bold)
+        {
+            ClearSingleStyleFromMarkRunProperties(typeof(Underline));
+            var newStyle = new Underline { Val = UnderlineValues.Dash };
             AddStyleToMarkRunProperties(newStyle);
         }
 

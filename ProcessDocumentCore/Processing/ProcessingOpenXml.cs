@@ -108,9 +108,10 @@ namespace ProcessDocumentCore.Processing
                         }
                         else
                         {
-                            SetParagraphStyle(para, CommonGost.StyleTypeEnum.GlobalText);
-                            foreach (var runs in para.Elements<Run>()) //Форматирование шрифта и его размера для каждого run'а
-                                SetRunStyle(runs, CommonGost.StyleTypeEnum.GlobalText);
+                                SetParagraphStyle(para, CommonGost.StyleTypeEnum.GlobalText);
+                                foreach (var runs in para.Elements<Run>()) //Форматирование шрифта и его размера для каждого run'а
+                                    SetRunStyle(runs, CommonGost.StyleTypeEnum.GlobalText);
+                                
                         }
                     }
 
@@ -139,11 +140,41 @@ namespace ProcessDocumentCore.Processing
             if (openXmlElement == null) return;
 
             var p = new OpenXmlGenericRepositoryRun<Run>(openXmlElement);
-            p.ClearAll();
-            if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
-            if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
-            if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
-            if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
+            if (openXmlElement.RunProperties.Bold != null )
+            {
+                p.ClearAll();
+                p.Bold(true);
+                if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
+                if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
+               // if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
+                if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
+            }
+            else if(openXmlElement.RunProperties.Italic != null)
+            {
+                p.ClearAll();
+                p.Italic(true);
+                if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
+                if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
+                if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
+                if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
+            }
+            else if(openXmlElement.RunProperties.Underline != null)
+            {
+                p.ClearAll();
+                p.Underline(true);
+                if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
+                if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
+                if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
+                if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
+            }
+            else
+            {
+                p.ClearAll();
+                if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
+                if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
+                if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
+                if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
+            }
         }
 
 
@@ -196,7 +227,7 @@ namespace ProcessDocumentCore.Processing
             if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
             if (_gostRepository.GetAlignment(typeStyle) != null) p.Justification(_gostRepository.GetAlignment(typeStyle));
             p.SpacingBetweenLines(_gostRepository.GetLineSpacing(typeStyle).nvl(), _gostRepository.GetBeforeSpacing(typeStyle).nvl(), _gostRepository.GetAfterSpacing(typeStyle).nvl());
-            p.Indentation(_gostRepository.GetFirstLineIndentation(typeStyle).nvl(), _gostRepository.GetLeftIndentation(typeStyle).nvl(), _gostRepository.GetRightIndentation(typeStyle).nvl());
+            p.Indentation(_gostRepository.GetFirstLineIndentation(typeStyle).nvl(), _gostRepository.GetLeftIndentation(typeStyle).nvl(), _gostRepository.GetRightIndentation(typeStyle).nvl());         
         }
 
      
