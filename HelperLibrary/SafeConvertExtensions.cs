@@ -244,9 +244,9 @@ namespace HelperLibrary
             return i;
         }
 
-        public static int ToMargins(this int i)
+        public static int ToMargins(this float i)
         {
-            return i * ConstVol.Margin.Multiplier;
+            return (int)(i * ConstVol.Margin.Multiplier);
         }
     }
 }
