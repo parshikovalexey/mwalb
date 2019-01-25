@@ -17,10 +17,10 @@ namespace StandardsLibrary.Simple
         public float LeftIndentation { get; set; }
         public float RightIndentation { get; set; }
         public string Alignment { get; set; }
-        public int MarginLeft { get; set; }
-        public int MarginRight { get; set; }
-        public int MarginTop { get; set; }
-        public int MarginBottom { get; set; }
+        public float MarginLeft { get; set; }
+        public float MarginRight { get; set; }
+        public float MarginTop { get; set; }
+        public float MarginBottom { get; set; }
         public string Color { get; set; }
         public bool Bold { get; set; }
     }

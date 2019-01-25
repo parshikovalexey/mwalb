@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HelperLibrary
 {
-  public   static class SafeConvertExtensions
+    public static class SafeConvertExtensions
     {
         public static String nvl(this string s)
         {
@@ -61,7 +57,7 @@ namespace HelperLibrary
         /// <param name="item"></param>
         /// <param name="default"></param>
         /// <returns>в случае успеха вернет преобразованное число, в другом случае возвращает @default</returns>
-        public static int SafeToInt(this double item, int @default=0)
+        public static int SafeToInt(this double item, int @default = 0)
         {
             int i = @default;
             Int32.TryParse(item.ToString(), out i);
@@ -111,6 +107,13 @@ namespace HelperLibrary
             //   return i;
         }
 
+        public static uint SafeToUint(this int? item, uint @default = 0)
+        {
+            uint i = @default;
+            if (item != null) uint.TryParse(item.ToString(), out i);
+            return i;
+        }
+
         /// <summary>
         /// Безопасное конвертирование из decimal в int 
         /// с указанием значения по умолчанию если конвертирование не удалось
@@ -118,7 +121,7 @@ namespace HelperLibrary
         /// <param name="item"></param>
         /// <param name="default"></param>
         /// <returns>в случае успеха вернет преобразованное число, в другом случае возвращает @default</returns>
-        public static int SafeToInt(this decimal item, int @default=0)
+        public static int SafeToInt(this decimal item, int @default = 0)
         {
             var i = @default;
             int.TryParse(item.ToString(), out i);
@@ -132,7 +135,7 @@ namespace HelperLibrary
         /// <param name="str"></param>
         /// <param name="default"></param>
         /// <returns> в случае успеха вернет преобразованное число, в другом случае возвращает @default</returns>
-        public static int SafeToInt(this string str, int @default=0)
+        public static int SafeToInt(this string str, int @default = 0)
         {
             int i = @default;
             if (!String.IsNullOrEmpty(str))
@@ -146,7 +149,7 @@ namespace HelperLibrary
         /// <param name="str"></param>
         /// <param name="default"></param>
         /// <returns> в случае успеха вернет преобразованное число, в другом случае возвращает 0</returns>
-        public static decimal SafeToDecimal(this string str, decimal @default=0)
+        public static decimal SafeToDecimal(this string str, decimal @default = 0)
         {
             decimal i = @default;
             if (!String.IsNullOrEmpty(str))
@@ -160,7 +163,7 @@ namespace HelperLibrary
         /// <param name="dateTime">дата/время string</param>
         /// <param name="default"></param>
         /// <returns>Возвращает дату/время в случае успеха или default(DateTime) если распарсить дату/время не удалось</returns>
-        public static DateTime SafeToDateTime(this string dateTime, DateTime @default=default(DateTime))
+        public static DateTime SafeToDateTime(this string dateTime, DateTime @default = default(DateTime))
         {
             var dt = @default;
             var canParseDt = DateTime.TryParse(dateTime, out dt);
@@ -172,7 +175,7 @@ namespace HelperLibrary
         /// </summary>
         /// <param name="str"></param>
         /// <returns> в случае успеха вернет преобразованное в логическое значение, в другом случае возвращает false</returns>
-        public static bool SafeToBoolean(this string str, bool @default=false)
+        public static bool SafeToBoolean(this string str, bool @default = false)
         {
             bool i = @default;
             if (!String.IsNullOrEmpty(str))
@@ -218,7 +221,7 @@ namespace HelperLibrary
         /// </summary>
         /// <param name="str"></param>
         /// <returns> в случае успеха вернет преобразованное число, в другом случае возвращает 0</returns>
-        public static double SafeToDouble(this float str, double @default=0)
+        public static double SafeToDouble(this float str, double @default = 0)
         {
             double i = @default;
             if (!String.IsNullOrEmpty(str.ToString()))
@@ -231,7 +234,7 @@ namespace HelperLibrary
         /// </summary>
         /// <param name="str"></param>
         /// <returns> в случае успеха вернет преобразованное число, в другом случае возвращает 0</returns>
-        public static double SafeToDouble(this float? str, double @default=0)
+        public static double SafeToDouble(this float? str, double @default = 0)
         {
             if (str == null)
                 return @default;
@@ -239,6 +242,11 @@ namespace HelperLibrary
             if (!String.IsNullOrEmpty(str.ToString()))
                 Double.TryParse(str.ToString(), out i);
             return i;
+        }
+
+        public static int ToMargins(this float i)
+        {
+            return (int)(i * ConstVol.Margin.Multiplier);
         }
     }
 }

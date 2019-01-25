@@ -1,4 +1,5 @@
 ﻿using CommonLibrary;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using HelperLibrary;
@@ -37,6 +38,10 @@ namespace ProcessDocumentCore.Processing
                     }
 
                     var body = wordDoc.MainDocumentPart.Document.Body;
+
+                    //устанавливаем отступы для всего документа
+                    SetPageMargin(body);
+
 
                     var isHeader = false;
 
@@ -134,6 +139,28 @@ namespace ProcessDocumentCore.Processing
             }
         }
 
+        private void SetPageMargin(Body body)
+        {
+            if (body == null) {
+                LoggerLibrary.Logger.Write().Error("Объект body null");
+                return;
+            }
+
+            try {
+                PageMargin pgMar = body.Descendants<PageMargin>().FirstOrDefault();
+                if (pgMar != null) {
+                    pgMar.Top = _gostRepository.GetMarginTop(CommonGost.StyleTypeEnum.GlobalText);
+                    pgMar.Bottom = _gostRepository.GetMarginBottom(CommonGost.StyleTypeEnum.GlobalText);
+                    pgMar.Left = new UInt32Value(_gostRepository.GetMarginLeft(CommonGost.StyleTypeEnum.GlobalText).SafeToUint());
+                    pgMar.Right = new UInt32Value(_gostRepository.GetMarginRight(CommonGost.StyleTypeEnum.GlobalText).SafeToUint());
+                }
+            }
+            catch (Exception e) {
+                LoggerLibrary.Logger.Write().Error(e);
+            }
+
+        }
+
         private void SetRunStyle(Run openXmlElement, CommonGost.StyleTypeEnum typeStyle)
         {
             if (openXmlElement == null) return;
@@ -199,7 +226,7 @@ namespace ProcessDocumentCore.Processing
             p.Indentation(_gostRepository.GetFirstLineIndentation(typeStyle).nvl(), _gostRepository.GetLeftIndentation(typeStyle).nvl(), _gostRepository.GetRightIndentation(typeStyle).nvl());
         }
 
-     
+
         private string GetPathToSaveObj()
         {
             return Path.GetFullPath(Path.Combine(PathHelper.TmpDirectory(), $"{Guid.NewGuid().ToString()}{ExtensionDoc}"));
