@@ -7,13 +7,14 @@ using StandardsLibrary.Simple;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
+using MahApps.Metro.Controls;
 
 namespace ProcessDocument.WPF
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : MetroWindow, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string name)
@@ -60,10 +61,10 @@ namespace ProcessDocument.WPF
             set => FilePathTextBox.Text = value;
         }
 
-        private string GostPath {
-            get => GostFilePathTextBox.Text;
-            set => GostFilePathTextBox.Text = value;
-        }
+        //private string GostPath {
+        //    get => GostFilePathTextBox.Text;
+        //    set => GostFilePathTextBox.Text = value;
+        //}
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
@@ -127,14 +128,14 @@ namespace ProcessDocument.WPF
             }
 
         }
-        private void LoadGostButton_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "JSON (*.json)|*.json";
-            if (openFileDialog.ShowDialog() == true)
-                GostPath = openFileDialog.FileName;
+        //private void LoadGostButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    OpenFileDialog openFileDialog = new OpenFileDialog();
+        //    openFileDialog.Filter = "JSON (*.json)|*.json";
+        //    if (openFileDialog.ShowDialog() == true)
+        //        GostPath = openFileDialog.FileName;
 
-        }
+        //}
 
         private void ToggleButton_OnCheckedTest(object sender, RoutedEventArgs e)
         {
@@ -146,6 +147,13 @@ namespace ProcessDocument.WPF
             _gostService.LoadGostFromFile();
             loadGosts();
             SelectGost = null;
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedGost = _gostService.GetGostModel(SelectGost.GuidGost);
+            GostViewer g = new GostViewer(selectedGost);
+            g.ShowDialog();
         }
     }
 }

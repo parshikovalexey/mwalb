@@ -1,0 +1,81 @@
+﻿<Window x:Class="ProcessDocument.WPF.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ProcessDocument.WPF"
+        xmlns:simple="clr-namespace:StandardsLibrary.Simple;assembly=StandardsLibrary"
+        mc:Ignorable="d"
+        Title="Window1" Height="593.182" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+           
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <TextBox Text="{local:DisplayName Font, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="0"></TextBox>
+        <TextBox Text="{local:DisplayName FontSize, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="1"></TextBox>
+        <TextBox Text="{local:DisplayName LineSpacing, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="2"></TextBox>
+        <TextBox Text="{local:DisplayName BeforeSpacing, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="3"></TextBox>
+        <TextBox Text="{local:DisplayName AfterSpacing, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="4"></TextBox>
+        <TextBox Text="{local:DisplayName FirstLineIndentation, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="5"></TextBox>
+        <TextBox Text="{local:DisplayName LeftIndentation, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="6"></TextBox>
+        <TextBox Text="{local:DisplayName RightIndentation, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="7"></TextBox>
+        <TextBox Text="{local:DisplayName Alignment, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="8"></TextBox>
+        <TextBox Text="{local:DisplayName MarginLeft, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="9"></TextBox>
+        <TextBox Text="{local:DisplayName MarginRight, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="10"></TextBox>
+        <TextBox Text="{local:DisplayName MarginTop, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="11"></TextBox>
+        <TextBox Text="{local:DisplayName MarginBottom, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="12"></TextBox>
+        <TextBox Text="{local:DisplayName Color, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="13"></TextBox>
+        <TextBox Text="{local:DisplayName Bold, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="14"></TextBox>
+
+        <TextBox Text="{Binding Model.Font,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="0"></TextBox>
+        <TextBox Text="{Binding Model.FontSize,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="1"></TextBox>
+        <TextBox Text="{Binding Model.LineSpacing,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="2"></TextBox>
+        <TextBox Text="{Binding Model.BeforeSpacing,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="3"></TextBox>
+        <TextBox Text="{Binding Model.AfterSpacing,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="4"></TextBox>
+        <TextBox Text="{Binding Model.FirstLineIndentation,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="5"></TextBox>
+        <TextBox Text="{Binding Model.LeftIndentation,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="6"></TextBox>
+        <TextBox Text="{Binding Model.RightIndentation,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="7"></TextBox>
+        <TextBox Text="{Binding Model.Alignment,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="8"></TextBox>
+        <TextBox Text="{Binding Model.MarginLeft,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="9"></TextBox>
+        <TextBox Text="{Binding Model.MarginRight,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="10"></TextBox>
+        <TextBox Text="{Binding Model.MarginTop,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="11"></TextBox>
+        <TextBox Text="{Binding Model.MarginBottom,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="12"></TextBox>
+        <TextBox Text="{Binding Model.Color,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="13"></TextBox>
+        <TextBox Text="{Binding Model.Bold,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="14"></TextBox>
+        <TextBox Text="{Binding Model.Font,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="0"></TextBox>
+        <TextBox Text="{Binding Model.FontSize,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="1"></TextBox>
+        <TextBox Text="{Binding Model.LineSpacing,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="2"></TextBox>
+        <TextBox Text="{Binding Model.BeforeSpacing,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="3"></TextBox>
+        <TextBox Text="{Binding Model.AfterSpacing,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="4"></TextBox>
+        <TextBox Text="{Binding Model.FirstLineIndentation,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="5"></TextBox>
+        <TextBox Text="{Binding Model.LeftIndentation,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="6"></TextBox>
+        <TextBox Text="{Binding Model.RightIndentation,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="7"></TextBox>
+        <TextBox Text="{Binding Model.Alignment,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="8"></TextBox>
+        <TextBox Text="{Binding Model.MarginLeft,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="9"></TextBox>
+        <TextBox Text="{Binding Model.MarginRight,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="10"></TextBox>
+        <TextBox Text="{Binding Model.MarginTop,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="11"></TextBox>
+        <TextBox Text="{Binding Model.MarginBottom,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="12"></TextBox>
+        <TextBox Text="{Binding Model.Color,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="13"></TextBox>
+        <TextBox Text="{Binding Model.Bold,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="14"></TextBox>
+
+    </Grid>
+</Window>
