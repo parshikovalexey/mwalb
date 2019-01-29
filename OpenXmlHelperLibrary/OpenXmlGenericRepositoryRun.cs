@@ -70,6 +70,26 @@ namespace OpenXmlHelperLibrary
             AddStyleToMarkRunProperties(newStyle);
         }
 
+        /// <summary>
+        /// Задает курсив для отрывка текста
+        /// </summary>
+        public void Italic(bool italic)
+        {
+            ClearSingleStyleFromMarkRunProperties(typeof(Italic));
+            var newStyle = new Italic() { Val = italic };
+            AddStyleToMarkRunProperties(newStyle);
+        }
+
+        /// <summary>
+        /// Задает подчеркивание для отрывка текста
+        /// </summary>
+        public void Underline(string uline)
+        {
+            ClearSingleStyleFromMarkRunProperties(typeof(Underline));
+            var newStyle = new Underline() { Val = uline.GetUnderlineByString() };
+            AddStyleToMarkRunProperties(newStyle);
+        }
+
         private void AddStyleToMarkRunProperties(OpenXmlElement obj)
         {
             try

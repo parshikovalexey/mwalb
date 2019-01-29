@@ -21,5 +21,7 @@ namespace StandardsLibrary.Simple
          [DisplayName("Поля: нижнее")] public float MarginBottom { get; set; }
          [DisplayName("Цвет текста")] public string Color { get; set; }
         [DisplayName("Жирный")] public bool Bold { get; set; }
+        [DisplayName("Курсив")] public bool Italic { get; set; }
+        [DisplayName("Подчеркивание")] public string Underline { get; set; }
     }
 }
