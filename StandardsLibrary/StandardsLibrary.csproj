@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,6 +54,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Simple\SimpleGost.cs" />
     <Compile Include="Simple\SimpleHeaderGost.cs" />
+    <Compile Include="Simple\SimpleNumbering.cs" />
+    <Compile Include="Simple\SimpleNumberingLevel.cs" />
     <Compile Include="Simple\SimpleStyle.cs" />
     <Compile Include="Standards.cs" />
   </ItemGroup>
@@ -63,6 +68,13 @@
       <Project>{ebe50f27-a25c-4baa-82d8-3f0d1c45f77f}</Project>
       <Name>HelperLibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OpenXmlHelperLibrary\OpenXmlHelperLibrary.csproj">
+      <Project>{5F881F8B-2775-4895-ABD7-CCF414AC57E9}</Project>
+      <Name>OpenXmlHelperLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

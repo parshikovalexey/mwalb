@@ -114,11 +114,15 @@ namespace StandardsLibrary
                     MarginTop = 0,
                     RightIndentation = 0,
                 },
+                Numbering = new SimpleNumbering()
+                {
+                    //Level1 = new SimpleNumberingLevel() {  NumberingFormat = SimpleNumberingLevel.NumberingEnum.NoFormat, LevelText = "%1"}
+                }
             };
             string json = JsonConvert.SerializeObject(g);
             PathHelper.DirectoryExists(_folderGostFile, true);
             //write string to file
-            System.IO.File.WriteAllText(Path.Combine(_folderGostFile, "demo.json"), json);
+            System.IO.File.WriteAllText(Path.Combine(_folderGostFile, "demoNew.json"), json);
         }
 
         public event Action<ResultExecute> Errors;

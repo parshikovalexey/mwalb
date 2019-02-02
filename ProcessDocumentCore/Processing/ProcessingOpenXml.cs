@@ -47,7 +47,11 @@ namespace ProcessDocumentCore.Processing
 
                     foreach (var para in body.Elements<Paragraph>())
                     {
-
+                        if (para.ParagraphProperties!=null && para.ParagraphProperties.Elements<NumberingProperties>().Any())
+                        {
+                            SetNumberingProperties(para, wordDoc);
+                            continue;
+                        }
                         bool isNeedChangeStyleForParagraph = false;
                         if ((para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd)) || para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack"))
                         {
@@ -139,23 +143,100 @@ namespace ProcessDocumentCore.Processing
             }
         }
 
+        private void SetNumberingProperties(Paragraph para, WordprocessingDocument wordDoc)
+        {
+            var numId = para.ParagraphProperties.FirstOrDefault(p => p.GetType() == typeof(NumberingProperties)).ToList()
+                .FirstOrDefault(p => p.GetType() == typeof(NumberingId));
+            if (numId is NumberingId num)
+            {
+                int v = -1;
+
+                var instances = wordDoc.MainDocumentPart.NumberingDefinitionsPart.Numbering.ToList()
+                    .Where(p => p is NumberingInstance);
+                foreach (var openXmlElement in instances)
+                {
+                    var instanceItem = (NumberingInstance)openXmlElement;
+                    if (instanceItem.NumberID.ToString() == num.Val.ToString())
+                    {
+                        v = instanceItem.AbstractNumId.Val;
+                        break;
+                    }
+                }
+
+
+                var abs = wordDoc.MainDocumentPart.NumberingDefinitionsPart.Numbering.ToList()
+                    .Where(p => p is AbstractNum);
+
+                foreach (var item in abs)
+                {
+                    if (item is AbstractNum an)
+                    {
+                        if (an.AbstractNumberId == v)
+                        {
+                            var levels = an.Where(e => e is Level);
+                            foreach (var itemLevel in levels)
+                            {
+                                if (itemLevel is Level level)
+                                {
+
+                                    var numberingFormat = _gostRepository.GetNumberingFormat(level.LevelIndex);
+                                    var levelText = _gostRepository.GetNumberingLevelText(level.LevelIndex);
+                                    level.NumberingFormat = new NumberingFormat() { Val = numberingFormat };
+                                    level.LevelText = new LevelText() { Val = levelText };
+
+                                    var prop = level?.NumberingSymbolRunProperties;
+                                    if (prop != null)
+                                        level?.NumberingSymbolRunProperties.Remove();
+
+
+                                    if (numberingFormat == NumberFormatValues.Bullet)
+                                    {
+
+                                        if (prop == null)
+                                        {
+                                            prop = new NumberingSymbolRunProperties();
+                                            level.Append(prop);
+                                        }
+                                        else
+                                        {
+                                            prop = new NumberingSymbolRunProperties();
+                                        }
+
+                                        RunFonts runFonts1 = new RunFonts()
+                                        { Hint = FontTypeHintValues.Default, Ascii = "Symbol", HighAnsi = "Symbol" };
+
+                                        prop.Append(runFonts1);
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private void SetPageMargin(Body body)
         {
-            if (body == null) {
+            if (body == null)
+            {
                 LoggerLibrary.Logger.Write().Error("Объект body null");
                 return;
             }
 
-            try {
+            try
+            {
                 PageMargin pgMar = body.Descendants<PageMargin>().FirstOrDefault();
-                if (pgMar != null) {
+                if (pgMar != null)
+                {
                     pgMar.Top = _gostRepository.GetMarginTop(CommonGost.StyleTypeEnum.GlobalText);
                     pgMar.Bottom = _gostRepository.GetMarginBottom(CommonGost.StyleTypeEnum.GlobalText);
                     pgMar.Left = new UInt32Value(_gostRepository.GetMarginLeft(CommonGost.StyleTypeEnum.GlobalText).SafeToUint());
                     pgMar.Right = new UInt32Value(_gostRepository.GetMarginRight(CommonGost.StyleTypeEnum.GlobalText).SafeToUint());
                 }
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 LoggerLibrary.Logger.Write().Error(e);
             }
 

@@ -14,7 +14,8 @@ namespace StandardsLibrary
         {
             GlobalText,
             Image,
-            Headline
+            Headline,
+            Numbering
         }
     }
 }
