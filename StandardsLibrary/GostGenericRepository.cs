@@ -2,6 +2,7 @@
 using HelperLibrary;
 using StandardsLibrary.Simple;
 using System.Collections.Generic;
+using DocumentFormat.OpenXml;
 using OpenXmlHelperLibrary;
 
 namespace StandardsLibrary
@@ -105,7 +106,7 @@ namespace StandardsLibrary
             }
         }
 
-        public float GetNumberingIndentationLeft(int level)
+        public string GetNumberingIndentationLeft(int level)
         {
             float indentationleft = 720;
             float nextIndentationleft = 720;
@@ -114,7 +115,10 @@ namespace StandardsLibrary
 
             if (_model.Numbering.LeftIndentation > 0) indentationleft = _model.Numbering.LeftIndentation;
 
-            return level > 0 ? level * nextIndentationleft : indentationleft;
+            var nextLevel = (level + 1) * nextIndentationleft;
+            return level > 0
+                ? nextLevel < 1 ? indentationleft.ToString() : nextLevel.ToString()
+                : indentationleft.ToString();
         }
 
 

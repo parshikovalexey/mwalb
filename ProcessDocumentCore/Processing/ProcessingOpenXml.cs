@@ -145,14 +145,18 @@ namespace ProcessDocumentCore.Processing
 
         private void SetNumberingProperties(Paragraph para, WordprocessingDocument wordDoc)
         {
+            //Все стили для списка хранятся в AbstractNum основного документа и связанны цепочкой ParagraphProperties.NumberingId -> MainDocumentPart.NumberingInstance.Val -> AbstractNum.AbstractNumberId
+
             var numId = para.ParagraphProperties.FirstOrDefault(p => p.GetType() == typeof(NumberingProperties)).ToList()
                 .FirstOrDefault(p => p.GetType() == typeof(NumberingId));
+
             if (numId is NumberingId num)
             {
                 int v = -1;
 
                 var instances = wordDoc.MainDocumentPart.NumberingDefinitionsPart.Numbering.ToList()
                     .Where(p => p is NumberingInstance);
+                //Ищем описания списка в основном документе по ID списка из параграфа
                 foreach (var openXmlElement in instances)
                 {
                     var instanceItem = (NumberingInstance)openXmlElement;
@@ -163,7 +167,7 @@ namespace ProcessDocumentCore.Processing
                     }
                 }
 
-
+                
                 var abs = wordDoc.MainDocumentPart.NumberingDefinitionsPart.Numbering.ToList()
                     .Where(p => p is AbstractNum);
 
@@ -181,6 +185,9 @@ namespace ProcessDocumentCore.Processing
 
                                     var numberingFormat = _gostRepository.GetNumberingFormat(level.LevelIndex);
                                     var levelText = _gostRepository.GetNumberingLevelText(level.LevelIndex);
+
+                                    SetlevelIndentation(level);
+
                                     level.NumberingFormat = new NumberingFormat() { Val = numberingFormat };
                                     level.LevelText = new LevelText() { Val = levelText };
 
@@ -213,6 +220,18 @@ namespace ProcessDocumentCore.Processing
                         }
                     }
                 }
+            }
+        }
+
+        private void SetlevelIndentation(Level level)
+        {
+            var paragraphProperties = level?.PreviousParagraphProperties;
+            var indentation = paragraphProperties?.FirstOrDefault(p =>
+                p.GetType() == typeof(Indentation));
+            if (indentation != null && indentation is Indentation levelIndentation)
+            {
+                levelIndentation.Left =
+                    _gostRepository.GetNumberingIndentationLeft(level.LevelIndex);
             }
         }
 
