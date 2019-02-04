@@ -188,9 +188,9 @@ namespace ProcessDocumentCore.Processing
                 {
                     foreach (var itemRun in item)
                     {
-                        if (itemRun is Run run) SetRunStyle(run, CommonGost.StyleTypeEnum.Image);
+                        if (itemRun is Run run) SetRunStyle(run, CommonGost.StyleTypeEnum.ImageCaption);
                     }
-                    SetParagraphStyle(item, CommonGost.StyleTypeEnum.Image);
+                    SetParagraphStyle(item, CommonGost.StyleTypeEnum.ImageCaption);
                     isNextRunIsHeaderImg = false;
 
                     if (!item.Any(r => r.GetType() == typeof(Run)))

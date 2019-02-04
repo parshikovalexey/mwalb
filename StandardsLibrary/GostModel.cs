@@ -8,6 +8,7 @@ namespace StandardsLibrary
         public string Header { get; set; }  = String.Empty;
         public SimpleStyle GlobalText { get; set; } = new SimpleStyle();
         public SimpleStyle Image { get; set; } = new SimpleStyle();
+        public SimpleStyle ImageCaption { get; set; } = new SimpleStyle();
         public SimpleStyle Headline { get; set; } = new SimpleStyle();
 
     }

@@ -57,6 +57,8 @@ namespace StandardsLibrary
                     return _model?.Image;
                 case CommonGost.StyleTypeEnum.Headline:
                     return _model?.Headline;
+                case CommonGost.StyleTypeEnum.ImageCaption:
+                    return _model?.ImageCaption;
                 default:
                     return null;
             }
