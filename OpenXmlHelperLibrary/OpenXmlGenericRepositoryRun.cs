@@ -10,12 +10,12 @@ namespace OpenXmlHelperLibrary
     public class OpenXmlGenericRepositoryRun<T> where T : Run
     {
         private readonly Run _run;
+
         public OpenXmlGenericRepositoryRun(Run run)
         {
             _run = run;
             if (run == null) return;
             if (_run.RunProperties == null) _run.RunProperties = new RunProperties();
-
         }
         public void ClearAll()
         {
@@ -63,7 +63,7 @@ namespace OpenXmlHelperLibrary
         public void Underline(bool bold)
         {
             ClearSingleStyleFromMarkRunProperties(typeof(Underline));
-            var newStyle = new Underline { Val = UnderlineValues.Dash };
+            var newStyle = new Underline { Val = UnderlineValues.Words };
             AddStyleToMarkRunProperties(newStyle);
         }
 
