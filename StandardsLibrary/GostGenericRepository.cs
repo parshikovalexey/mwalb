@@ -106,7 +106,7 @@ namespace StandardsLibrary
             }
         }
 
-        public string GetNumberingIndentationLeft(int level)
+        public float GetNumberingIndentationLeft(int level)
         {
             float indentationleft = 720;
             float nextIndentationleft = 720;
@@ -117,11 +117,10 @@ namespace StandardsLibrary
 
             var nextLevel = (level + 1) * nextIndentationleft;
             return level > 0
-                ? nextLevel < 1 ? indentationleft.ToString() : nextLevel.ToString()
-                : indentationleft.ToString();
+                ? nextLevel < 1 ? indentationleft : nextLevel
+                : indentationleft;
         }
-
-
+       
 
 
 
