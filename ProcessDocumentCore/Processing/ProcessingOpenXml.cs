@@ -144,8 +144,6 @@ namespace ProcessDocumentCore.Processing
             var p = new OpenXmlGenericRepositoryRun<Run>(openXmlElement);
             foreach ( var run in openXmlElement.Elements<RunProperties>())
             {
-                //if (run.Bold != null && run.Bold?.Val == false)
-                //    run.Bold.FirstOrDefault(x => (object)run.Bold != null && x.GetType() == (object)run.Bold)?.Remove();
                 if (run.Bold != null && (run.Bold.Val == null || run.Bold.Val == true))
                 {
                     p.ClearAll();
@@ -166,8 +164,9 @@ namespace ProcessDocumentCore.Processing
                 }
                 else if(run.Underline != null)
                 {
+                    string uVal = run.Underline.Val;
                     p.ClearAll();
-                    p.Underline(true);
+                    p.Underline(uVal);
                     if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
                     if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
                     if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
@@ -176,7 +175,6 @@ namespace ProcessDocumentCore.Processing
                 else
                 {
                     p.ClearAll();
-                    //p.Bold(true);
                     if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
                     if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
                     if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());

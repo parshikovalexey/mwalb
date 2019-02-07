@@ -60,10 +60,10 @@ namespace OpenXmlHelperLibrary
             AddStyleToMarkRunProperties(newStyle);
         }
 
-        public void Underline(bool bold)
+        public void Underline(string uVal)
         {
             ClearSingleStyleFromMarkRunProperties(typeof(Underline));
-            var newStyle = new Underline { Val = UnderlineValues.Words };
+            var newStyle = new Underline { Val = uVal.GetUnderlineByString() };
             AddStyleToMarkRunProperties(newStyle);
         }
 
