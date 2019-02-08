@@ -1,27 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace StandardsLibrary.Simple
 {
- public class SimpleStyle
+    public class SimpleStyle
     {
+        [DisplayName("Шрифт")]
         public string Font { get; set; }
+        [DisplayName("Размер шрифта")]
         public int FontSize { get; set; }
-        public float LineSpacing { get; set; }
-        public float BeforeSpacing { get; set; }
-        public float AfterSpacing { get; set; }
-        public float FirstLineIndentation { get; set; }
-        public float LeftIndentation { get; set; }
-        public float RightIndentation { get; set; }
-        public string Alignment { get; set; }
-        public int MarginLeft { get; set; }
-        public int MarginRight { get; set; }
-        public int MarginTop { get; set; }
-        public int MarginBottom { get; set; }
-        public string Color { get; set; }
-        public bool Bold { get; set; }
+        [DisplayName("Межстрочный интервал")] public float LineSpacing { get; set; }
+        [DisplayName("Интервал перед абзацем")] public float BeforeSpacing { get; set; }
+         [DisplayName("Интервал после абзацем")] public float AfterSpacing { get; set; }
+         [DisplayName("Дополнительный отступ к первой строке")] public float FirstLineIndentation { get; set; }
+         [DisplayName("Отступ слева")] public float LeftIndentation { get; set; }
+         [DisplayName("Отступ справа")] public float RightIndentation { get; set; }
+         [DisplayName("Выравнивание")] public string Alignment { get; set; }
+         [DisplayName("Поля: левое")] public float MarginLeft { get; set; }
+         [DisplayName("Поля: правое")] public float MarginRight { get; set; }
+         [DisplayName("Поля: верхнее")] public float MarginTop { get; set; }
+         [DisplayName("Поля: нижнее")] public float MarginBottom { get; set; }
+         [DisplayName("Цвет текста")] public string Color { get; set; }
+        [DisplayName("Жирный")] public bool Bold { get; set; }
+        [DisplayName("Курсив")] public bool Italic { get; set; }
+        [DisplayName("Подчеркивание")] public string Underline { get; set; }
     }
 }

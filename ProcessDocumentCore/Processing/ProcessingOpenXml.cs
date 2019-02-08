@@ -1,4 +1,5 @@
 ﻿using CommonLibrary;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using HelperLibrary;
@@ -37,6 +38,10 @@ namespace ProcessDocumentCore.Processing
                     }
 
                     var body = wordDoc.MainDocumentPart.Document.Body;
+
+                    //устанавливаем отступы для всего документа
+                    SetPageMargin(body);
+
 
                     var isHeader = false;
 
@@ -108,10 +113,9 @@ namespace ProcessDocumentCore.Processing
                         }
                         else
                         {
-                                SetParagraphStyle(para, CommonGost.StyleTypeEnum.GlobalText);
+                            SetParagraphStyle(para, CommonGost.StyleTypeEnum.GlobalText);
                             foreach (var runs in para.Elements<Run>())
                                 SetRunStyle(runs, CommonGost.StyleTypeEnum.GlobalText);
-                             //Форматирование шрифта и его размера для каждого run'а
                                   
                                 
                         }
@@ -135,6 +139,28 @@ namespace ProcessDocumentCore.Processing
                 stream?.Close();
                 return new ResultExecute().OnError(ex.Message);
             }
+        }
+
+        private void SetPageMargin(Body body)
+        {
+            if (body == null) {
+                LoggerLibrary.Logger.Write().Error("Объект body null");
+                return;
+            }
+
+            try {
+                PageMargin pgMar = body.Descendants<PageMargin>().FirstOrDefault();
+                if (pgMar != null) {
+                    pgMar.Top = _gostRepository.GetMarginTop(CommonGost.StyleTypeEnum.GlobalText);
+                    pgMar.Bottom = _gostRepository.GetMarginBottom(CommonGost.StyleTypeEnum.GlobalText);
+                    pgMar.Left = new UInt32Value(_gostRepository.GetMarginLeft(CommonGost.StyleTypeEnum.GlobalText).SafeToUint());
+                    pgMar.Right = new UInt32Value(_gostRepository.GetMarginRight(CommonGost.StyleTypeEnum.GlobalText).SafeToUint());
+                }
+            }
+            catch (Exception e) {
+                LoggerLibrary.Logger.Write().Error(e);
+            }
+
         }
 
         private void SetRunStyle(Run openXmlElement, CommonGost.StyleTypeEnum typeStyle)
@@ -182,6 +208,8 @@ namespace ProcessDocumentCore.Processing
 
                 }
             }
+            if (_gostRepository.GetItalic(typeStyle) != null) p.Italic(_gostRepository.GetItalic(typeStyle).nvl());
+            if (_gostRepository.GetUnderline(typeStyle) != null) p.Underline(_gostRepository.GetUnderline(typeStyle));
         }
 
 
@@ -234,10 +262,9 @@ namespace ProcessDocumentCore.Processing
             if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
             if (_gostRepository.GetAlignment(typeStyle) != null) p.Justification(_gostRepository.GetAlignment(typeStyle));
             p.SpacingBetweenLines(_gostRepository.GetLineSpacing(typeStyle).nvl(), _gostRepository.GetBeforeSpacing(typeStyle).nvl(), _gostRepository.GetAfterSpacing(typeStyle).nvl());
-            p.Indentation(_gostRepository.GetFirstLineIndentation(typeStyle).nvl(), _gostRepository.GetLeftIndentation(typeStyle).nvl(), _gostRepository.GetRightIndentation(typeStyle).nvl());         
         }
 
-     
+
         private string GetPathToSaveObj()
         {
             return Path.GetFullPath(Path.Combine(PathHelper.TmpDirectory(), $"{Guid.NewGuid().ToString()}{ExtensionDoc}"));
