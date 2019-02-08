@@ -10,12 +10,12 @@ namespace OpenXmlHelperLibrary
     public class OpenXmlGenericRepositoryRun<T> where T : Run
     {
         private readonly Run _run;
+
         public OpenXmlGenericRepositoryRun(Run run)
         {
             _run = run;
             if (run == null) return;
             if (_run.RunProperties == null) _run.RunProperties = new RunProperties();
-
         }
         public void ClearAll()
         {
@@ -26,7 +26,6 @@ namespace OpenXmlHelperLibrary
             }
         }
 
-        
 
         public void FontSize(int size)
         {
@@ -54,6 +53,20 @@ namespace OpenXmlHelperLibrary
             AddStyleToMarkRunProperties(newStyle);
         }
 
+        public void Italic(bool bold)
+        {
+            ClearSingleStyleFromMarkRunProperties(typeof(Italic));
+            var newStyle = new Italic { Val = bold };
+            AddStyleToMarkRunProperties(newStyle);
+        }
+
+        public void Underline(string uVal)
+        {
+            ClearSingleStyleFromMarkRunProperties(typeof(Underline));
+            var newStyle = new Underline { Val = uVal.GetUnderlineByString() };
+            AddStyleToMarkRunProperties(newStyle);
+        }
+
         /// <summary>
         /// Задаем шрифт для текста
         /// </summary>
@@ -67,26 +80,6 @@ namespace OpenXmlHelperLibrary
             if (!string.IsNullOrEmpty(ascii)) newStyle.Ascii = ascii;
             if (!string.IsNullOrEmpty(highAnsi)) newStyle.HighAnsi = highAnsi;
             if (!string.IsNullOrEmpty(complexScript)) newStyle.ComplexScript = complexScript;
-            AddStyleToMarkRunProperties(newStyle);
-        }
-
-        /// <summary>
-        /// Задает курсив для отрывка текста
-        /// </summary>
-        public void Italic(bool italic)
-        {
-            ClearSingleStyleFromMarkRunProperties(typeof(Italic));
-            var newStyle = new Italic() { Val = italic };
-            AddStyleToMarkRunProperties(newStyle);
-        }
-
-        /// <summary>
-        /// Задает подчеркивание для отрывка текста
-        /// </summary>
-        public void Underline(string uline)
-        {
-            ClearSingleStyleFromMarkRunProperties(typeof(Underline));
-            var newStyle = new Underline() { Val = uline.GetUnderlineByString() };
             AddStyleToMarkRunProperties(newStyle);
         }
 
