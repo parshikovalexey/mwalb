@@ -155,5 +155,12 @@ namespace ProcessDocument.WPF
             GostViewer g = new GostViewer(selectedGost);
             g.ShowDialog();
         }
+
+        private void ShowGostViewer_OnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedGost = _gostService.GetGostModel(SelectGost.GuidGost);
+            GostViewer g = new GostViewer(selectedGost);
+            g.ShowDialog();
+        }
     }
 }

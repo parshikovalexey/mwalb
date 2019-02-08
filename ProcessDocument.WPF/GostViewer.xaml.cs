@@ -45,7 +45,14 @@ namespace ProcessDocument.WPF
         {
             var result = new List<GostModelViewer>();
 
-            result.Add(new GostModelViewer(){ Header="Стиль основного текста", Model=_currentGostModel.GlobalText});
+            result.Add(new GostModelViewer(){ Header="Стиль основного текста", Model=_currentGostModel.GlobalText, ListDescription = new List<SimpleGostModelViewer>()
+            {
+                new SimpleGostModelViewer()
+                {
+                    Description = "Test",
+                    Value = "123"
+                }
+            }});
             result.Add(new GostModelViewer(){ Header= "Стиль изображений", Model=_currentGostModel.Headline});
             result.Add(new GostModelViewer(){ Header= "Стиль заголовков", Model=_currentGostModel.Image});
 
@@ -58,6 +65,13 @@ namespace ProcessDocument.WPF
     public class GostModelViewer
     {
         public string Header { get; set; }
+       public List<SimpleGostModelViewer> ListDescription = new List<SimpleGostModelViewer>();
         public SimpleStyle Model { get; set; }
+    }
+
+    public class SimpleGostModelViewer
+    {
+        public string Description { get; set; }
+        public string Value { get; set; }
     }
 }

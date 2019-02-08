@@ -57,6 +57,19 @@
                                        BasedOn="{StaticResource MetroFlatButton}" />
                             </Button.Style>
                         </Button>
+                        <Button
+                           
+                            Margin="5,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Click="ShowGostViewer_OnClick"
+Visibility="Collapsed"
+                            Content="Просмотр" >
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}"
+                                       BasedOn="{StaticResource MetroFlatButton}" />
+                            </Button.Style>
+                        </Button>
                     </StackPanel>
 
                 </DataTemplate>
