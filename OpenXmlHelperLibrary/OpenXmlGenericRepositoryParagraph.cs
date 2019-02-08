@@ -91,6 +91,7 @@ namespace OpenXmlHelperLibrary
         public void Indentation(float firstLineIndentation, float leftIndentation, float rightIndentation)
         {
             ClearSingleStyleFromMarkRunProperties(typeof(Indentation));
+            ClearSingleStyleFromProperties(typeof(Indentation));
             var newStyle = new Indentation() //Отступы
             {
                 FirstLine = ((int)(firstLineIndentation * 567 - leftIndentation * 567)).ToString(),
@@ -193,6 +194,12 @@ namespace OpenXmlHelperLibrary
             else _paragraph.ParagraphProperties.Indentation = indent;
         }
 
+        public int GetNumberingLevelReference()
+        {
+          var numberingLevelReference  =   _paragraph.ParagraphProperties.FirstOrDefault(element => element is NumberingLevelReference);
+          return 1;
+        }
+
         private void AddStyleToMarkRunProperties(OpenXmlElement obj)
         {
             try
@@ -222,7 +229,7 @@ namespace OpenXmlHelperLibrary
             }
 
         }
-        private void ClearSingleStyleFromMarkRunProperties(object obj)
+        public void ClearSingleStyleFromMarkRunProperties(object obj)
         {
             try
             {
@@ -240,7 +247,7 @@ namespace OpenXmlHelperLibrary
 
         }
 
-        private void ClearSingleStyleFromProperties(object obj)
+        public void ClearSingleStyleFromProperties(object obj)
         {
             try
             {

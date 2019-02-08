@@ -9,6 +9,6 @@ namespace StandardsLibrary
         public SimpleStyle GlobalText { get; set; } = new SimpleStyle();
         public SimpleStyle Image { get; set; } = new SimpleStyle();
         public SimpleStyle Headline { get; set; } = new SimpleStyle();
-
+        public SimpleNumbering Numbering { get; set;} = new SimpleNumbering();
     }
 }

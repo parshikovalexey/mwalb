@@ -1,5 +1,9 @@
-﻿using HelperLibrary;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using HelperLibrary;
 using StandardsLibrary.Simple;
+using System.Collections.Generic;
+using DocumentFormat.OpenXml;
+using OpenXmlHelperLibrary;
 
 namespace StandardsLibrary
 {
@@ -7,9 +11,26 @@ namespace StandardsLibrary
     {
         private readonly GostModel _model = null;
 
+        private readonly Dictionary<int, SimpleNumberingLevel> _numberingDictionary = new Dictionary<int, SimpleNumberingLevel>();
+
         public GostGenericRepository(GostModel @base)
         {
             _model = @base;
+
+            if (_model.Numbering != null)
+            {
+                _numberingDictionary.Clear();
+                _numberingDictionary.Add(0, _model?.Numbering?.Level1 ?? new SimpleNumberingLevel());
+                _numberingDictionary.Add(1, _model?.Numbering?.Level2 ?? new SimpleNumberingLevel());
+                _numberingDictionary.Add(2, _model?.Numbering?.Level3 ?? new SimpleNumberingLevel());
+                _numberingDictionary.Add(3, _model?.Numbering?.Level4 ?? new SimpleNumberingLevel());
+                _numberingDictionary.Add(4, _model?.Numbering?.Level5 ?? new SimpleNumberingLevel());
+                _numberingDictionary.Add(5, _model?.Numbering?.Level6 ?? new SimpleNumberingLevel());
+                _numberingDictionary.Add(6, _model?.Numbering?.Level7 ?? new SimpleNumberingLevel());
+                _numberingDictionary.Add(7, _model?.Numbering?.Level8 ?? new SimpleNumberingLevel());
+                _numberingDictionary.Add(8, _model?.Numbering?.Level9 ?? new SimpleNumberingLevel());
+            }
+
         }
 
         /// <summary>
@@ -65,5 +86,47 @@ namespace StandardsLibrary
                     return null;
             }
         }
+
+
+
+        public NumberFormatValues GetNumberingFormat(int level)
+        {
+            return _numberingDictionary.ContainsKey(level) ? _numberingDictionary[level].NumberingFormat.GetNumberingFormat() : NumberFormatValues.Decimal;
+        }
+        public string GetNumberingLevelText(int level)
+        {
+            if (_numberingDictionary.ContainsKey(level))
+            {
+                return _numberingDictionary[level].LevelText;
+            }
+            else
+            {
+                var levelText = string.Empty;
+                for (var j = 0; j < level+1; j++)
+                {
+                    levelText += $"%{j + 1}.";
+                }
+                return $"{levelText} ";
+            }
+        }
+
+        public float GetNumberingIndentationLeft(int level)
+        {
+            float indentationleft = 720;
+            float nextIndentationleft = 720;
+
+            if (_model.Numbering.LeftNextIndentation>0) nextIndentationleft = _model.Numbering.LeftIndentation;
+
+            if (_model.Numbering.LeftIndentation > 0) indentationleft = _model.Numbering.LeftIndentation;
+
+            var nextLevel = (level + 1) * nextIndentationleft;
+            return level > 0
+                ? nextLevel < 1 ? indentationleft : nextLevel
+                : indentationleft;
+        }
+       
+
+
+
     }
 }

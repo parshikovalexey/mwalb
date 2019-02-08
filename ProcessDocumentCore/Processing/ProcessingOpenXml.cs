@@ -47,78 +47,53 @@ namespace ProcessDocumentCore.Processing
 
                     foreach (var para in body.Elements<Paragraph>())
                     {
-
-                        bool isNeedChangeStyleForParagraph = false;
-                        if ((para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd)) || para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack"))
+                        var isNeedClearProperty = true;
+                        var isNeedChangeStyleForParagraph = false;
+                        var isNumberingParagraph = false;
+                        if (para.ParagraphProperties != null && para.ParagraphProperties.Elements<NumberingProperties>().Any())
                         {
-                            foreach (var openXmlElement1 in para.ToList().Where(x => x is Run).ToList())
-                            {
-                                var openXmlElement = (Run)openXmlElement1;
-                                Debug.WriteLine(openXmlElement.InnerText);
-                                ////Определяем есть ли нумерованный список для задания стиля всему параграфу, т.к. на него распотсраняется отдельный стиль
-                                //var hasNumberingProperties = para.ParagraphProperties.FirstOrDefault(o =>
-                                //    o.GetType() == typeof(NumberingProperties));
-                                //if (hasNumberingProperties != null)
-                                isNeedChangeStyleForParagraph = true;
-
-                                SetRunStyle(openXmlElement, CommonGost.StyleTypeEnum.Headline);
-                            }
-                            //    if (isHeader == false)
-                            //    {
-                            //        //var p = new OpenXmlGenericRepositoryParagraph<Paragraph>(para);
-                            //        //p.ClearAll();
-                            //        //p.Justification(_designStandard.GetAlignment());
-
-                            //        //// Выранивание для текста
-                            //        //var textAlignBody = para.ParagraphProperties.FirstOrDefault(x =>
-                            //        //    x.GetType() == typeof(Justification));
-                            //        //if (textAlignBody != null)
-                            //        //{
-                            //        //    var _el = (Justification)textAlignBody;
-                            //        //    _el.Val = (Extension.GetJustificationByString(_designStandard.GetAlignment()));
-                            //        //}
-                            //        //else
-                            //        //{
-                            //        //    var _el = new Justification() { Val = Extension.GetJustificationByString(_designStandard.GetAlignment()) };
-                            //        //    para.ParagraphProperties.Append(_el);
-                            //        //}
-                            //    }
-                            //    else
-                            //    {
-                            //        var p = new OpenXmlGenericRepositoryParagraph<Paragraph>(para);
-                            //        p.ClearAll();
-                            //        p.Justification(_gostRepository.GetAlignment(CommonGost.StyleTypeEnum.GlobalText));
-                            //        //// Определяем положение выравнивания для заголовков
-                            //        //var textAlignHead = para.ParagraphProperties.FirstOrDefault(x =>
-                            //        //x.GetType() == typeof(Justification));
-                            //        //if (textAlignHead != null)
-                            //        //{
-                            //        //    var _el = (Justification)textAlignHead;
-                            //        //    _el.Val = (Extension.GetJustificationByString(_designStandard.GetAlignment()));
-                            //        //}
-                            //        //else
-                            //        //{
-                            //        //    var _el = new Justification() { Val = Extension.GetJustificationByString(_designStandard.GetAlignment()) };
-                            //        //    para.ParagraphProperties.Append(_el);
-                            //        //}
-                            //    }
+                            isNumberingParagraph = true;
+                            isNeedClearProperty = false;
                         }
+                        else
+                        {
 
+                            if ((para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd)) || para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack"))
+                            {
+                                foreach (var openXmlElement1 in para.ToList().Where(x => x is Run).ToList())
+                                {
+                                    var openXmlElement = (Run)openXmlElement1;
+                                    Debug.WriteLine(openXmlElement.InnerText);
+                                    ////Определяем есть ли нумерованный список для задания стиля всему параграфу, т.к. на него распотсраняется отдельный стиль
+                                    //var hasNumberingProperties = para.ParagraphProperties.FirstOrDefault(o =>
+                                    //    o.GetType() == typeof(NumberingProperties));
+                                    //if (hasNumberingProperties != null)
+                                    isNeedChangeStyleForParagraph = true;
+
+                                    SetRunStyle(openXmlElement, CommonGost.StyleTypeEnum.Headline);
+                                }
+                            }
+
+
+                        }
 
 
                         if (isNeedChangeStyleForParagraph)
                         {
-                            SetParagraphStyle(para, CommonGost.StyleTypeEnum.Headline);
-                            //SetParagraphStyle(para);
+                            SetParagraphStyle(para, CommonGost.StyleTypeEnum.Headline, isNeedClearProperty);
                         }
                         else
                         {
-                            SetParagraphStyle(para, CommonGost.StyleTypeEnum.GlobalText);
-                            foreach (var runs in para.Elements<Run>())
+                            
+                            SetParagraphStyle(para, CommonGost.StyleTypeEnum.GlobalText, isNeedClearProperty);
+                            foreach (var runs in para.Elements<Run>()) //Форматирование шрифта и его размера для каждого run'а
                                 SetRunStyle(runs, CommonGost.StyleTypeEnum.GlobalText);
                                   
                                 
                         }
+                        //Делаем форматирование списков после того, как основной текст отформатирован
+                        if (isNumberingParagraph)
+                            SetNumberingProperties(para, wordDoc);
                     }
 
                     CorrectImage(body);
@@ -141,23 +116,129 @@ namespace ProcessDocumentCore.Processing
             }
         }
 
+        private void SetNumberingProperties(Paragraph para, WordprocessingDocument wordDoc)
+        {
+            //Все стили для списка хранятся в AbstractNum основного документа и связанны цепочкой ParagraphProperties.NumberingId -> MainDocumentPart.NumberingInstance.Val -> AbstractNum.AbstractNumberId
+
+            var numId = para.ParagraphProperties.FirstOrDefault(p => p.GetType() == typeof(NumberingProperties)).ToList()
+                .FirstOrDefault(p => p.GetType() == typeof(NumberingId));
+
+            //удаляем Indentation из параграфа, т.к. будут использоваться отступы из стилей нумерованных списков
+            var pg = new OpenXmlGenericRepositoryParagraph<Paragraph>(para);
+            pg.ClearSingleStyleFromProperties(typeof(Indentation));
+            pg.ClearSingleStyleFromMarkRunProperties(typeof(Indentation));
+
+            if (numId is NumberingId num)
+            {
+                int v = -1;
+
+                var instances = wordDoc.MainDocumentPart.NumberingDefinitionsPart.Numbering.ToList()
+                    .Where(p => p is NumberingInstance);
+
+                //Ищем описания списка в основном документе по ID списка из параграфа
+                foreach (var openXmlElement in instances)
+                {
+                    var instanceItem = (NumberingInstance)openXmlElement;
+                    if (instanceItem.NumberID.ToString() == num.Val.ToString())
+                    {
+                        v = instanceItem.AbstractNumId.Val;
+                        break;
+                    }
+                }
+
+
+                var abs = wordDoc.MainDocumentPart.NumberingDefinitionsPart.Numbering.ToList()
+                    .Where(p => p is AbstractNum);
+
+                foreach (var item in abs)
+                {
+                    if (item is AbstractNum an)
+                    {
+                        if (an.AbstractNumberId == v)
+                        {
+                            var levels = an.Where(e => e is Level);
+                            foreach (var itemLevel in levels)
+                            {
+                                if (itemLevel is Level level)
+                                {
+
+                                    var numberingFormat = _gostRepository.GetNumberingFormat(level.LevelIndex);
+                                    var levelText = _gostRepository.GetNumberingLevelText(level.LevelIndex);
+
+                                    SetlevelIndentation(level);
+
+                                    level.NumberingFormat = new NumberingFormat() { Val = numberingFormat };
+                                    level.LevelText = new LevelText() { Val = levelText };
+
+                                    var prop = level?.NumberingSymbolRunProperties;
+                                    if (prop != null)
+                                        level?.NumberingSymbolRunProperties.Remove();
+
+
+                                    if (numberingFormat == NumberFormatValues.Bullet)
+                                    {
+
+                                        if (prop == null)
+                                        {
+                                            prop = new NumberingSymbolRunProperties();
+                                            level.Append(prop);
+                                        }
+                                        else
+                                        {
+                                            prop = new NumberingSymbolRunProperties();
+                                        }
+
+                                        RunFonts runFonts1 = new RunFonts()
+                                        { Hint = FontTypeHintValues.Default, Ascii = "Symbol", HighAnsi = "Symbol" };
+
+                                        prop.Append(runFonts1);
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SetlevelIndentation(Level level)
+        {
+            var paragraphProperties = level?.PreviousParagraphProperties;
+            var indentation = paragraphProperties?.FirstOrDefault(p =>
+                p.GetType() == typeof(Indentation));
+            if (indentation != null && indentation is Indentation levelIndentation)
+            {
+                levelIndentation.Left =
+                    _gostRepository.GetNumberingIndentationLeft(level.LevelIndex).ToString();
+            }
+        }
+
         private void SetPageMargin(Body body)
         {
-            if (body == null) {
+          
+            if (body == null)
+            {
                 LoggerLibrary.Logger.Write().Error("Объект body null");
                 return;
             }
 
-            try {
+          
+            try
+            {
                 PageMargin pgMar = body.Descendants<PageMargin>().FirstOrDefault();
-                if (pgMar != null) {
+              
+                if (pgMar != null)
+                {
                     pgMar.Top = _gostRepository.GetMarginTop(CommonGost.StyleTypeEnum.GlobalText);
                     pgMar.Bottom = _gostRepository.GetMarginBottom(CommonGost.StyleTypeEnum.GlobalText);
                     pgMar.Left = new UInt32Value(_gostRepository.GetMarginLeft(CommonGost.StyleTypeEnum.GlobalText).SafeToUint());
                     pgMar.Right = new UInt32Value(_gostRepository.GetMarginRight(CommonGost.StyleTypeEnum.GlobalText).SafeToUint());
                 }
             }
-            catch (Exception e) {
+         
+            catch (Exception e)
+            {
                 LoggerLibrary.Logger.Write().Error(e);
             }
 
@@ -229,7 +310,8 @@ namespace ProcessDocumentCore.Processing
                     {
                         if (itemRun is Run run) SetRunStyle(run, CommonGost.StyleTypeEnum.Image);
                     }
-                    SetParagraphStyle(item, CommonGost.StyleTypeEnum.Image);
+                 
+                    SetParagraphStyle(item, CommonGost.StyleTypeEnum.Image, true);
                     isNextRunIsHeaderImg = false;
 
                     if (!item.Any(r => r.GetType() == typeof(Run)))
@@ -244,18 +326,21 @@ namespace ProcessDocumentCore.Processing
                 if (findDrawing)
                 {
                     isNextRunIsHeaderImg = true;
-                    SetParagraphStyle(item, CommonGost.StyleTypeEnum.Image);
+                 
+                    SetParagraphStyle(item, CommonGost.StyleTypeEnum.Image, true);
                 }
             }
         }
 
-        private void SetParagraphStyle(Paragraph para, CommonGost.StyleTypeEnum typeStyle)
+
+        private void SetParagraphStyle(Paragraph para, CommonGost.StyleTypeEnum typeStyle, bool clearAllProperties)
         {
 
             if (para == null) return;
 
             var p = new OpenXmlGenericRepositoryParagraph<Paragraph>(para);
-            p.ClearAll();
+            if (clearAllProperties) p.ClearAll();
+
             if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
             if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
             if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
