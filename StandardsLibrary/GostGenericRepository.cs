@@ -68,6 +68,10 @@ namespace StandardsLibrary
 
         public string GetColor(CommonGost.StyleTypeEnum typeStyle) => GetDirectoryStyle(typeStyle)?.Color;
 
+        public bool? GetItalic(CommonGost.StyleTypeEnum typeStyle) => GetDirectoryStyle(typeStyle)?.Italic;
+
+        public string GetUnderline(CommonGost.StyleTypeEnum typeStyle) => GetDirectoryStyle(typeStyle)?.Underline;
+
         private SimpleStyle GetDirectoryStyle(CommonGost.StyleTypeEnum typeStyle)
         {
             switch (typeStyle)
