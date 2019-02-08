@@ -20,5 +20,19 @@ namespace OpenXmlHelperLibrary
             }
             return @default;
         }
+
+        public static UnderlineValues GetUnderlineByString(this string underlineVol, UnderlineValues @default = UnderlineValues.None)
+        {
+            switch (underlineVol.ToLower())
+            {
+                case "single": return UnderlineValues.Single;
+                case "double": return UnderlineValues.Double;
+                case "dash": return UnderlineValues.Dash;
+                case "thick": return UnderlineValues.Thick;
+                case "wave": return UnderlineValues.Wave;
+                case "none": return UnderlineValues.None;
+            }
+            return @default;
+        }
     }
 }
