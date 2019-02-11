@@ -49,8 +49,8 @@ C:\Users\jaren\Documents\Git\mwalb\OpenXmlHelperLibrary\bin\Debug\System.Securit
 C:\Users\jaren\Documents\Git\mwalb\OpenXmlHelperLibrary\bin\Debug\System.Security.Cryptography.X509Certificates.dll
 C:\Users\jaren\Documents\Git\mwalb\OpenXmlHelperLibrary\bin\Debug\System.Xml.ReaderWriter.dll
 C:\Users\jaren\Documents\Git\mwalb\OpenXmlHelperLibrary\bin\Debug\System.Diagnostics.DiagnosticSource.xml
+C:\Users\jaren\Documents\Git\mwalb\OpenXmlHelperLibrary\obj\Debug\OpenXmlHelperLibrary.csprojAssemblyReference.cache
 C:\Users\jaren\Documents\Git\mwalb\OpenXmlHelperLibrary\obj\Debug\OpenXmlHelperLibrary.csproj.CoreCompileInputs.cache
 C:\Users\jaren\Documents\Git\mwalb\OpenXmlHelperLibrary\obj\Debug\OpenXmlHelperLibrary.csproj.CopyComplete
 C:\Users\jaren\Documents\Git\mwalb\OpenXmlHelperLibrary\obj\Debug\OpenXmlHelperLibrary.dll
 C:\Users\jaren\Documents\Git\mwalb\OpenXmlHelperLibrary\obj\Debug\OpenXmlHelperLibrary.pdb
-C:\Users\jaren\Documents\Git\mwalb\OpenXmlHelperLibrary\obj\Debug\OpenXmlHelperLibrary.csprojAssemblyReference.cache

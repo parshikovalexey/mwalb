@@ -9,73 +9,61 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ItemsControl ItemsSource="{Binding View, Mode=TwoWay}">
+        <ItemsControl ItemsSource="{Binding View}">
+       
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ItemsControl ItemsSource="{Binding ListDescription}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Description}"/>
+                                <!-- You Are missing this! -->
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+
+        <!--<ItemsControl ItemsSource="{Binding View}">
+            <ItemsControl ItemsSource="{Binding ListDescription}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding ListDescription.Description}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ItemsControl>-->
+
+
+        <!--<ItemsControl ItemsSource="{Binding View, Mode=TwoWay}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <ItemsControl >
                         <Expander Header="{Binding Header}">
                             <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
-                                    <RowDefinition Height="40"/>
 
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="200"/>
-                                    <ColumnDefinition Width="1*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{local:DisplayName Font, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="0"></TextBlock>
-                                <TextBlock Text="{local:DisplayName FontSize, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="1"></TextBlock>
-                                <TextBlock Text="{local:DisplayName LineSpacing, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="2"></TextBlock>
-                                <TextBlock Text="{local:DisplayName BeforeSpacing, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="3"></TextBlock>
-                                <TextBlock Text="{local:DisplayName AfterSpacing, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="4"></TextBlock>
-                                <TextBlock Text="{local:DisplayName FirstLineIndentation, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="5"></TextBlock>
-                                <TextBlock Text="{local:DisplayName LeftIndentation, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="6"></TextBlock>
-                                <TextBlock Text="{local:DisplayName RightIndentation, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="7"></TextBlock>
-                                <TextBlock Text="{local:DisplayName Alignment, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="8"></TextBlock>
-                                <TextBlock Text="{local:DisplayName MarginLeft, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="9"></TextBlock>
-                                <TextBlock Text="{local:DisplayName MarginRight, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="10"></TextBlock>
-                                <TextBlock Text="{local:DisplayName MarginTop, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="11"></TextBlock>
-                                <TextBlock Text="{local:DisplayName MarginBottom, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="12"></TextBlock>
-                                <TextBlock Text="{local:DisplayName Color, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="13"></TextBlock>
-                                <TextBlock Text="{local:DisplayName Bold, Type=simple:SimpleStyle}" Margin="5" Grid.Column="0" Grid.Row="14"></TextBlock>
-
-                                <TextBlock Text="{Binding Model.Font,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="0"></TextBlock>
-                                <TextBlock Text="{Binding Model.FontSize,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="1"></TextBlock>
-                                <TextBlock Text="{Binding Model.LineSpacing,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="2"></TextBlock>
-                                <TextBlock Text="{Binding Model.BeforeSpacing,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="3"></TextBlock>
-                                <TextBlock Text="{Binding Model.AfterSpacing,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="4"></TextBlock>
-                                <TextBlock Text="{Binding Model.FirstLineIndentation,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="5"></TextBlock>
-                                <TextBlock Text="{Binding Model.LeftIndentation,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="6"></TextBlock>
-                                <TextBlock Text="{Binding Model.RightIndentation,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="7"></TextBlock>
-                                <TextBlock Text="{Binding Model.Alignment,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="8"></TextBlock>
-                                <TextBlock Text="{Binding Model.MarginLeft,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="9"></TextBlock>
-                                <TextBlock Text="{Binding Model.MarginRight,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="10"></TextBlock>
-                                <TextBlock Text="{Binding Model.MarginTop,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="11"></TextBlock>
-                                <TextBlock Text="{Binding Model.MarginBottom,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="12"></TextBlock>
-                                <TextBlock Text="{Binding Model.Color,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="13"></TextBlock>
-                                <TextBlock Text="{Binding Model.Bold,  Mode=TwoWay}" Margin="5" Grid.Column="1" Grid.Row="14"></TextBlock>
-                             
-
+                                <ItemsControl ItemsSource="{Binding ListDescription, Mode=TwoWay}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <ItemsControl >
+                                                <StackPanel>
+                                                    <TextBlock Text="123"></TextBlock>
+                                                    <TextBlock Text="{Binding Description}"></TextBlock>
+                                                    <TextBlock Text="{Binding Value}"></TextBlock>
+                                                </StackPanel>
+                                            </ItemsControl>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </Grid>
+
                         </Expander>
-                      
+
                     </ItemsControl>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        </ItemsControl>-->
     </Grid>
 </mah:MetroWindow>

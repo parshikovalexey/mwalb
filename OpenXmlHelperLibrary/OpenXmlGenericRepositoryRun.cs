@@ -10,12 +10,12 @@ namespace OpenXmlHelperLibrary
     public class OpenXmlGenericRepositoryRun<T> where T : Run
     {
         private readonly Run _run;
+
         public OpenXmlGenericRepositoryRun(Run run)
         {
             _run = run;
             if (run == null) return;
             if (_run.RunProperties == null) _run.RunProperties = new RunProperties();
-
         }
         public void ClearAll()
         {
@@ -26,7 +26,6 @@ namespace OpenXmlHelperLibrary
             }
         }
 
-        
 
         public void FontSize(int size)
         {
@@ -51,6 +50,20 @@ namespace OpenXmlHelperLibrary
         {
             ClearSingleStyleFromMarkRunProperties(typeof(Bold));
             var newStyle = new Bold { Val = bold };
+            AddStyleToMarkRunProperties(newStyle);
+        }
+
+        public void Italic(bool bold)
+        {
+            ClearSingleStyleFromMarkRunProperties(typeof(Italic));
+            var newStyle = new Italic { Val = bold };
+            AddStyleToMarkRunProperties(newStyle);
+        }
+
+        public void Underline(string uVal)
+        {
+            ClearSingleStyleFromMarkRunProperties(typeof(Underline));
+            var newStyle = new Underline { Val = uVal.GetUnderlineByString() };
             AddStyleToMarkRunProperties(newStyle);
         }
 
