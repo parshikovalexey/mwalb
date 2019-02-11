@@ -42,7 +42,6 @@ namespace ProcessDocumentCore.Processing
                     //устанавливаем отступы для всего документа
                     SetPageMargin(body);
 
-
                     var isHeader = false;
 
                     foreach (var para in body.Elements<Paragraph>())
@@ -97,6 +96,9 @@ namespace ProcessDocumentCore.Processing
                     }
 
                     CorrectImage(body);
+
+                    SetHeaderPartStyle(wordDoc);
+                    SetFooterPartStyle(wordDoc);
 
                     using (StreamWriter sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))
                     {
@@ -349,6 +351,31 @@ namespace ProcessDocumentCore.Processing
             p.SpacingBetweenLines(_gostRepository.GetLineSpacing(typeStyle).nvl(), _gostRepository.GetBeforeSpacing(typeStyle).nvl(), _gostRepository.GetAfterSpacing(typeStyle).nvl());
         }
 
+        private void SetHeaderPartStyle(WordprocessingDocument wDoc)
+        {
+            var paragrpahs = wDoc.MainDocumentPart.HeaderParts.FirstOrDefault().Header.Elements<Paragraph>();
+            foreach (var p in paragrpahs)
+            {
+                SetParagraphStyle(p, CommonGost.StyleTypeEnum.HeaderPart, true);
+                foreach (var r in p.Elements<Run>())
+                {
+                    SetRunStyle(r, CommonGost.StyleTypeEnum.HeaderPart);
+                }
+            }
+        }
+
+        private void SetFooterPartStyle(WordprocessingDocument wDoc)
+        {
+            var paragrpahs = wDoc.MainDocumentPart.FooterParts.FirstOrDefault().Footer.Elements<Paragraph>();
+            foreach (var p in paragrpahs)
+            {
+                SetParagraphStyle(p, CommonGost.StyleTypeEnum.FooterPart, true);
+                foreach (var r in p.Elements<Run>())
+                {
+                    SetRunStyle(r, CommonGost.StyleTypeEnum.FooterPart);
+                }
+            }
+        }
 
         private string GetPathToSaveObj()
         {
