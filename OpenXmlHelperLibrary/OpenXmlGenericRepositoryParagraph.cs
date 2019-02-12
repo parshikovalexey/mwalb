@@ -61,9 +61,16 @@ namespace OpenXmlHelperLibrary
 
         public void Bold(bool bold)
         {
-            ClearSingleStyleFromMarkRunProperties(typeof(Bold));
-            var newStyle = new Bold { Val = bold };
-            AddStyleToMarkRunProperties(newStyle);
+            if (bold)
+            {
+                ClearSingleStyleFromMarkRunProperties(typeof(Bold));
+                var newStyle = new Bold { Val= bold};
+                AddStyleToMarkRunProperties(newStyle);
+            }
+            else
+            {
+                ClearSingleStyleFromMarkRunProperties(typeof(Bold));
+            }
         }
         public void RunFonts(string ascii, string highAnsi)
         {

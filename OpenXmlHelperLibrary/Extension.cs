@@ -26,6 +26,7 @@ namespace OpenXmlHelperLibrary
                 case "thick": return UnderlineValues.Thick;
                 case "wave": return UnderlineValues.Wave;
                 case "none": return UnderlineValues.None;
+                case "words": return UnderlineValues.Words;
             }
             return @default;
         }
