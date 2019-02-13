@@ -353,11 +353,11 @@ namespace ProcessDocumentCore.Processing
 
         private void SetHeaderPartStyle(WordprocessingDocument wDoc)
         {
-            var paragrpahs = wDoc.MainDocumentPart.HeaderParts.FirstOrDefault().Header.Elements<Paragraph>();
+            var paragrpahs = wDoc.MainDocumentPart.HeaderParts.FirstOrDefault().Header.Descendants<Paragraph>().ToList();
             foreach (var p in paragrpahs)
             {
                 SetParagraphStyle(p, CommonGost.StyleTypeEnum.HeaderPart, true);
-                foreach (var r in p.Elements<Run>())
+                foreach (var r in p.Descendants<Run>().ToList())
                 {
                     SetRunStyle(r, CommonGost.StyleTypeEnum.HeaderPart);
                 }
@@ -366,11 +366,11 @@ namespace ProcessDocumentCore.Processing
 
         private void SetFooterPartStyle(WordprocessingDocument wDoc)
         {
-            var paragrpahs = wDoc.MainDocumentPart.FooterParts.FirstOrDefault().Footer.Elements<Paragraph>();
+            var paragrpahs = wDoc.MainDocumentPart.FooterParts.FirstOrDefault().Footer.Descendants<Paragraph>().ToList();
             foreach (var p in paragrpahs)
             {
                 SetParagraphStyle(p, CommonGost.StyleTypeEnum.FooterPart, true);
-                foreach (var r in p.Elements<Run>())
+                foreach (var r in p.Descendants<Run>().ToList())
                 {
                     SetRunStyle(r, CommonGost.StyleTypeEnum.FooterPart);
                 }
