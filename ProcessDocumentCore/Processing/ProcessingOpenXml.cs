@@ -251,7 +251,7 @@ namespace ProcessDocumentCore.Processing
             var p = new OpenXmlGenericRepositoryRun<Run>(openXmlElement);
             foreach ( var run in openXmlElement.Elements<RunProperties>())
             {
-                if (run.Bold != null && (run.Bold.Val == null || run.Bold.Val == true || run.Bold.Val == false))
+                if (run.Bold != null)
                 {
                     p.ClearAll();
                     p.Bold(true);
