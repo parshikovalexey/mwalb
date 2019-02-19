@@ -7,6 +7,7 @@ namespace StandardsLibrary.Simple
        
         [DisplayName("Отступ 0 уровень")] public float LeftIndentation { get; set; }
         [DisplayName("Отступ следующих уровней")] public float LeftNextIndentation { get; set; }
+        [DisplayName("Отступ номера")] public float Hanging { get; set; }
         [DisplayName("Стиль Уровень 1")] public SimpleNumberingLevel Level1 { get; set; } 
         [DisplayName("Стиль Уровень 2")] public SimpleNumberingLevel Level2 { get; set; }
         [DisplayName("Стиль Уровень 3")] public SimpleNumberingLevel Level3 { get; set; }

@@ -166,6 +166,7 @@ namespace ProcessDocumentCore.Processing
                                     var levelText = _gostRepository.GetNumberingLevelText(level.LevelIndex);
 
                                     SetlevelIndentation(level);
+                                    SetLevelJustification(level);
 
                                     level.NumberingFormat = new NumberingFormat() { Val = numberingFormat };
                                     level.LevelText = new LevelText() { Val = levelText };
@@ -207,10 +208,21 @@ namespace ProcessDocumentCore.Processing
             var paragraphProperties = level?.PreviousParagraphProperties;
             var indentation = paragraphProperties?.FirstOrDefault(p =>
                 p.GetType() == typeof(Indentation));
+            int multiplier = 567;
             if (indentation != null && indentation is Indentation levelIndentation)
             {
                 levelIndentation.Left =
-                    _gostRepository.GetNumberingIndentationLeft(level.LevelIndex).ToString();
+                    ((int)(_gostRepository.GetNumberingIndentationLeft(level.LevelIndex) * multiplier)).ToString();
+                levelIndentation.Hanging = ((int)(_gostRepository.GetNumberingHanging() * multiplier)).ToString();
+            }
+        }
+
+        private void SetLevelJustification(Level level)
+        {
+            var justification = level.LevelJustification;
+            if (justification != null)
+            {
+                justification.Val = _gostRepository.GetNumberingJustification(level.LevelIndex);
             }
         }
 

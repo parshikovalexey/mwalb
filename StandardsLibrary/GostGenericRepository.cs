@@ -102,7 +102,7 @@ namespace StandardsLibrary
             else
             {
                 var levelText = string.Empty;
-                for (var j = 0; j < level+1; j++)
+                for (var j = 0; j < level + 1; j++)
                 {
                     levelText += $"%{j + 1}.";
                 }
@@ -112,10 +112,10 @@ namespace StandardsLibrary
 
         public float GetNumberingIndentationLeft(int level)
         {
-            float indentationleft = 720;
-            float nextIndentationleft = 720;
+            float indentationleft = 1;
+            float nextIndentationleft = 1;
 
-            if (_model.Numbering.LeftNextIndentation>0) nextIndentationleft = _model.Numbering.LeftIndentation;
+            if (_model.Numbering.LeftNextIndentation > 0) nextIndentationleft = _model.Numbering.LeftNextIndentation;
 
             if (_model.Numbering.LeftIndentation > 0) indentationleft = _model.Numbering.LeftIndentation;
 
@@ -124,9 +124,18 @@ namespace StandardsLibrary
                 ? nextLevel < 1 ? indentationleft : nextLevel
                 : indentationleft;
         }
-       
 
+        public LevelJustificationValues GetNumberingJustification(int level)
+        {
+            if (_numberingDictionary.ContainsKey(level))
+                return _numberingDictionary[level].LevelJustification.GetLevelJustificationByString();
+            else return LevelJustificationValues.Left;
+        }
 
+        public float GetNumberingHanging()
+        {
+            return _model.Numbering.Hanging;
+        }
 
     }
 }

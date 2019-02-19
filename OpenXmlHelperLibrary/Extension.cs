@@ -16,6 +16,17 @@ namespace OpenXmlHelperLibrary
             return @default;
         }
 
+        public static LevelJustificationValues GetLevelJustificationByString(this string justificationVol, LevelJustificationValues @default = LevelJustificationValues.Left)
+        {
+            switch (justificationVol.ToLower())
+            {
+                case "center": return LevelJustificationValues.Center;
+                case "left": return LevelJustificationValues.Left;
+                case "right": return LevelJustificationValues.Right;
+            }
+            return @default;
+        }
+
         public static UnderlineValues GetUnderlineByString(this string underlineVol, UnderlineValues @default = UnderlineValues.None)
         {
             switch (underlineVol.ToLower())
