@@ -115,9 +115,8 @@ namespace StandardsLibrary
             float indentationleft = 1;
             float nextIndentationleft = 1;
 
-            if (_model.Numbering.LeftNextIndentation > 0) nextIndentationleft = _model.Numbering.LeftNextIndentation;
-
-            if (_model.Numbering.LeftIndentation > 0) indentationleft = _model.Numbering.LeftIndentation;
+            nextIndentationleft = _model.Numbering.LeftNextIndentation;
+            indentationleft = _model.Numbering.LeftIndentation;
 
             var nextLevel = (level + 1) * nextIndentationleft;
             return level > 0
