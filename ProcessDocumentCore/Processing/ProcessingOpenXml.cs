@@ -253,15 +253,24 @@ namespace ProcessDocumentCore.Processing
             {
                 bool bold, italic;
                 UnderlineValues underline;
-
                 bold = (run.Bold != null && (run.Bold.Val == null || run.Bold.Val == true)) ? true : false;
                 italic = (run.Italic != null && (run.Italic.Val == null || run.Italic.Val == true)) ? true : false;
                 underline = (run.Underline != null && run.Underline.Val != null) ? run.Underline.Val.Value : UnderlineValues.None;
 
                 p.ClearAll();
-                p.Bold(bold);
-                p.Italic(italic);
-                p.Underline(underline.ToString());
+                if (typeStyle == CommonGost.StyleTypeEnum.GlobalText)
+                {
+                    p.Bold(bold);
+                    p.Italic(italic);
+                    p.Underline(underline.ToString());
+                }
+                else
+                {
+                    if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
+                    if (_gostRepository.GetItalic(typeStyle) != null) p.Italic(_gostRepository.GetItalic(typeStyle).nvl());
+                    if (_gostRepository.GetUnderline(typeStyle) != null) p.Underline(_gostRepository.GetUnderline(typeStyle));
+                }
+
                 if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
                 if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
                 if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
