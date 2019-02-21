@@ -373,6 +373,7 @@ namespace ProcessDocumentCore.Processing
 
         private void SetHeaderPartStyle(WordprocessingDocument wDoc)
         {
+            if (!wDoc.MainDocumentPart.HeaderParts.Any()) return;
             var paragrpahs = wDoc.MainDocumentPart.HeaderParts.FirstOrDefault().Header.Descendants<Paragraph>().ToList();
             foreach (var p in paragrpahs)
             {
@@ -386,6 +387,7 @@ namespace ProcessDocumentCore.Processing
 
         private void SetFooterPartStyle(WordprocessingDocument wDoc)
         {
+            if (!wDoc.MainDocumentPart.HeaderParts.Any()) return;
             var paragrpahs = wDoc.MainDocumentPart.FooterParts.FirstOrDefault().Footer.Descendants<Paragraph>().ToList();
             foreach (var p in paragrpahs)
             {
