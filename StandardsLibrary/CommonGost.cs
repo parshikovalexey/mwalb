@@ -16,7 +16,9 @@ namespace StandardsLibrary
             Image,
             ImageCaption,
             Headline,
-            Numbering
+            Numbering,
+            HeaderPart,
+            FooterPart
         }
     }
 }

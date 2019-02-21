@@ -16,6 +16,17 @@ namespace OpenXmlHelperLibrary
             return @default;
         }
 
+        public static LevelJustificationValues GetLevelJustificationByString(this string justificationVol, LevelJustificationValues @default = LevelJustificationValues.Left)
+        {
+            switch (justificationVol.ToLower())
+            {
+                case "center": return LevelJustificationValues.Center;
+                case "left": return LevelJustificationValues.Left;
+                case "right": return LevelJustificationValues.Right;
+            }
+            return @default;
+        }
+
         public static UnderlineValues GetUnderlineByString(this string underlineVol, UnderlineValues @default = UnderlineValues.None)
         {
             switch (underlineVol.ToLower())
@@ -26,6 +37,7 @@ namespace OpenXmlHelperLibrary
                 case "thick": return UnderlineValues.Thick;
                 case "wave": return UnderlineValues.Wave;
                 case "none": return UnderlineValues.None;
+                case "words": return UnderlineValues.Words;
             }
             return @default;
         }
@@ -38,7 +50,7 @@ namespace OpenXmlHelperLibrary
                 case "decimal": return NumberFormatValues.Decimal;
                 case "lowerletter": return NumberFormatValues.LowerLetter;
                 case "lowerroman": return NumberFormatValues.LowerRoman;
-                case "noformat": return NumberFormatValues.Decimal;
+                case "noformat": return NumberFormatValues.None;
                 default: return @default;
             }
 
