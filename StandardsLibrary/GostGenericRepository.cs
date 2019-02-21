@@ -91,7 +91,7 @@ namespace StandardsLibrary
 
         public NumberFormatValues GetNumberingFormat(int level)
         {
-            return _numberingDictionary.ContainsKey(level) ? _numberingDictionary[level].NumberingFormat.GetNumberingFormat() : NumberFormatValues.Decimal;
+            return _numberingDictionary.ContainsKey(level) ? _numberingDictionary[level].NumberingFormat.GetNumberingFormat() : NumberFormatValues.None;
         }
         public string GetNumberingLevelText(int level)
         {

@@ -49,7 +49,7 @@ namespace OpenXmlHelperLibrary
                 case "decimal": return NumberFormatValues.Decimal;
                 case "lowerletter": return NumberFormatValues.LowerLetter;
                 case "lowerroman": return NumberFormatValues.LowerRoman;
-                case "noformat": return NumberFormatValues.Decimal;
+                case "noformat": return NumberFormatValues.None;
                 default: return @default;
             }
 
