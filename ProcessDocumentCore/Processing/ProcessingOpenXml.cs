@@ -328,7 +328,7 @@ namespace ProcessDocumentCore.Processing
                 {
                     foreach (var itemRun in item)
                     {
-                        if (itemRun is Run run) SetRunStyle(run, CommonGost.StyleTypeEnum.Image);
+                        if (itemRun is Run run) SetRunStyle(run, CommonGost.StyleTypeEnum.ImageCaption);
                     }
 
                     SetParagraphStyle(item, CommonGost.StyleTypeEnum.Image, true);
@@ -348,6 +348,7 @@ namespace ProcessDocumentCore.Processing
                     isNextRunIsHeaderImg = true;
 
                     SetParagraphStyle(item, CommonGost.StyleTypeEnum.Image, true);
+                    SetRunStyle(item.GetFirstChild<Run>(), CommonGost.StyleTypeEnum.Image);
                 }
             }
         }
@@ -367,6 +368,7 @@ namespace ProcessDocumentCore.Processing
             if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
             if (_gostRepository.GetAlignment(typeStyle) != null) p.Justification(_gostRepository.GetAlignment(typeStyle));
             p.SpacingBetweenLines(_gostRepository.GetLineSpacing(typeStyle).nvl(), _gostRepository.GetBeforeSpacing(typeStyle).nvl(), _gostRepository.GetAfterSpacing(typeStyle).nvl());
+            p.Indentation(_gostRepository.GetFirstLineIndentation(typeStyle).nvl(), _gostRepository.GetLeftIndentation(typeStyle).nvl(), _gostRepository.GetRightIndentation(typeStyle).nvl());
         }
 
         private void SetHeaderPartStyle(WordprocessingDocument wDoc)

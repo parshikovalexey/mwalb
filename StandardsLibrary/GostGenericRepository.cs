@@ -86,7 +86,9 @@ namespace StandardsLibrary
                     return _model?.HeaderPart;
                 case CommonGost.StyleTypeEnum.FooterPart:
                     return _model?.FooterPart;
-                default:
+                case CommonGost.StyleTypeEnum.ImageCaption:
+                    return _model?.ImageCaption;
+		default:
                     return null;
             }
         }
