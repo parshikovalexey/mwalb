@@ -49,8 +49,10 @@ namespace OpenXmlHelperLibrary
         public void Bold(bool bold)
         {
             ClearSingleStyleFromMarkRunProperties(typeof(Bold));
-            var newStyle = new Bold { Val = bold };
-            AddStyleToMarkRunProperties(newStyle);
+            if (bold)
+            {
+                AddStyleToMarkRunProperties(new Bold { Val = bold });
+            }
         }
 
         public void Italic(bool bold)
