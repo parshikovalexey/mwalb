@@ -82,6 +82,10 @@ namespace StandardsLibrary
                     return _model?.Image;
                 case CommonGost.StyleTypeEnum.Headline:
                     return _model?.Headline;
+                case CommonGost.StyleTypeEnum.HeaderPart:
+                    return _model?.HeaderPart;
+                case CommonGost.StyleTypeEnum.FooterPart:
+                    return _model?.FooterPart;
                 default:
                     return null;
             }

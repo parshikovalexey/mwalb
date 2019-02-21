@@ -15,7 +15,9 @@ namespace StandardsLibrary
             GlobalText,
             Image,
             Headline,
-            Numbering
+            Numbering,
+            HeaderPart,
+            FooterPart
         }
     }
 }
