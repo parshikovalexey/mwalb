@@ -267,39 +267,21 @@ namespace ProcessDocumentCore.Processing
             var p = new OpenXmlGenericRepositoryRun<Run>(openXmlElement);
             foreach (var run in openXmlElement.Elements<RunProperties>())
             {
-                if (run.Bold != null && (run.Bold.Val == null || run.Bold.Val == true))
+                bool bold, italic;
+                UnderlineValues underline;
+                bold = (run.Bold != null && (run.Bold.Val == null || run.Bold.Val == true)) ? true : false;
+                italic = (run.Italic != null && (run.Italic.Val == null || run.Italic.Val == true)) ? true : false;
+                underline = (run.Underline != null && run.Underline.Val != null) ? run.Underline.Val.Value : UnderlineValues.None;
+
+                p.ClearAll();
+                if (typeStyle == CommonGost.StyleTypeEnum.GlobalText)
                 {
-                    p.ClearAll();
-                    p.Bold(true);
-                    if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
-                    if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
-                    //if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
-                    if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
-                }
-                else if (run.Italic != null && (run.Italic.Val == null || run.Italic.Val == true))
-                {
-                    p.ClearAll();
-                    p.Italic(true);
-                    if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
-                    if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
-                    if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
-                    if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
-                }
-                else if (run.Underline != null)
-                {
-                    string uVal = run.Underline.Val;
-                    p.ClearAll();
-                    p.Underline(uVal);
-                    if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
-                    if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
-                    if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
-                    if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
+                    p.Bold(bold);
+                    p.Italic(italic);
+                    p.Underline(underline.ToString());
                 }
                 else
                 {
-                    p.ClearAll();
-                    if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
-                    if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
                     if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
                     if (_gostRepository.GetItalic(typeStyle) != null) p.Italic(_gostRepository.GetItalic(typeStyle).nvl());
                     if (_gostRepository.GetUnderline(typeStyle) != null) p.Underline(_gostRepository.GetUnderline(typeStyle));
@@ -308,7 +290,6 @@ namespace ProcessDocumentCore.Processing
                 if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
                 if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
                 if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
-
             }
 
         }
@@ -373,6 +354,7 @@ namespace ProcessDocumentCore.Processing
 
         private void SetHeaderPartStyle(WordprocessingDocument wDoc)
         {
+            if (!wDoc.MainDocumentPart.HeaderParts.Any()) return;
             var paragrpahs = wDoc.MainDocumentPart.HeaderParts.FirstOrDefault().Header.Descendants<Paragraph>().ToList();
             foreach (var p in paragrpahs)
             {
@@ -386,6 +368,7 @@ namespace ProcessDocumentCore.Processing
 
         private void SetFooterPartStyle(WordprocessingDocument wDoc)
         {
+            if (!wDoc.MainDocumentPart.HeaderParts.Any()) return;
             var paragrpahs = wDoc.MainDocumentPart.FooterParts.FirstOrDefault().Footer.Descendants<Paragraph>().ToList();
             foreach (var p in paragrpahs)
             {
