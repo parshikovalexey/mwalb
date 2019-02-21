@@ -8,6 +8,8 @@ namespace StandardsLibrary.Simple
         public string NumberingFormat { get; set; } = NumberingEnum.NoFormat.ToString();
         [DisplayName("Шаблон нумерации уровня")]
         public string LevelText { get; set; }
+        [DisplayName("Выравнивание уровня")]
+        public string LevelJustification { get; set; }
 
         public enum NumberingEnum
         {

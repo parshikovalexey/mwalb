@@ -42,7 +42,6 @@ namespace ProcessDocumentCore.Processing
                     //устанавливаем отступы для всего документа
                     SetPageMargin(body);
 
-
                     var isHeader = false;
 
                     foreach (var para in body.Elements<Paragraph>())
@@ -97,6 +96,9 @@ namespace ProcessDocumentCore.Processing
                     }
 
                     CorrectImage(body);
+
+                    SetHeaderPartStyle(wordDoc);
+                    SetFooterPartStyle(wordDoc);
 
                     using (StreamWriter sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))
                     {
@@ -166,34 +168,37 @@ namespace ProcessDocumentCore.Processing
                                     var levelText = _gostRepository.GetNumberingLevelText(level.LevelIndex);
 
                                     SetlevelIndentation(level);
+                                    SetLevelJustification(level);
 
-                                    level.NumberingFormat = new NumberingFormat() { Val = numberingFormat };
-                                    level.LevelText = new LevelText() { Val = levelText };
-
-                                    var prop = level?.NumberingSymbolRunProperties;
-                                    if (prop != null)
-                                        level?.NumberingSymbolRunProperties.Remove();
-
-
-                                    if (numberingFormat == NumberFormatValues.Bullet)
+                                    if (numberingFormat != NumberFormatValues.None)
                                     {
+                                        level.NumberingFormat = new NumberingFormat() { Val = numberingFormat };
+                                        level.LevelText = new LevelText() { Val = levelText };
 
-                                        if (prop == null)
+                                        var prop = level?.NumberingSymbolRunProperties;
+                                        if (prop != null)
+                                            level?.NumberingSymbolRunProperties.Remove();
+
+
+                                        if (numberingFormat == NumberFormatValues.Bullet)
                                         {
-                                            prop = new NumberingSymbolRunProperties();
-                                            level.Append(prop);
-                                        }
-                                        else
-                                        {
-                                            prop = new NumberingSymbolRunProperties();
-                                        }
 
-                                        RunFonts runFonts1 = new RunFonts()
-                                        { Hint = FontTypeHintValues.Default, Ascii = "Symbol", HighAnsi = "Symbol" };
+                                            if (prop == null)
+                                            {
+                                                prop = new NumberingSymbolRunProperties();
+                                                level.Append(prop);
+                                            }
+                                            else
+                                            {
+                                                prop = new NumberingSymbolRunProperties();
+                                            }
 
-                                        prop.Append(runFonts1);
+                                            RunFonts runFonts1 = new RunFonts()
+                                            { Hint = FontTypeHintValues.Default, Ascii = "Symbol", HighAnsi = "Symbol" };
+
+                                            prop.Append(runFonts1);
+                                        }
                                     }
-
                                 }
                             }
                         }
@@ -207,10 +212,21 @@ namespace ProcessDocumentCore.Processing
             var paragraphProperties = level?.PreviousParagraphProperties;
             var indentation = paragraphProperties?.FirstOrDefault(p =>
                 p.GetType() == typeof(Indentation));
+            int multiplier = 567;
             if (indentation != null && indentation is Indentation levelIndentation)
             {
                 levelIndentation.Left =
-                    _gostRepository.GetNumberingIndentationLeft(level.LevelIndex).ToString();
+                    ((int)(_gostRepository.GetNumberingIndentationLeft(level.LevelIndex) * multiplier)).ToString();
+                levelIndentation.Hanging = ((int)(_gostRepository.GetNumberingHanging() * multiplier)).ToString();
+            }
+        }
+
+        private void SetLevelJustification(Level level)
+        {
+            var justification = level.LevelJustification;
+            if (justification != null)
+            {
+                justification.Val = _gostRepository.GetNumberingJustification(level.LevelIndex);
             }
         }
 
@@ -251,21 +267,39 @@ namespace ProcessDocumentCore.Processing
             var p = new OpenXmlGenericRepositoryRun<Run>(openXmlElement);
             foreach (var run in openXmlElement.Elements<RunProperties>())
             {
-                bool bold, italic;
-                UnderlineValues underline;
-                bold = (run.Bold != null && (run.Bold.Val == null || run.Bold.Val == true)) ? true : false;
-                italic = (run.Italic != null && (run.Italic.Val == null || run.Italic.Val == true)) ? true : false;
-                underline = (run.Underline != null && run.Underline.Val != null) ? run.Underline.Val.Value : UnderlineValues.None;
-
-                p.ClearAll();
-                if (typeStyle == CommonGost.StyleTypeEnum.GlobalText)
+                if (run.Bold != null && (run.Bold.Val == null || run.Bold.Val == true))
                 {
-                    p.Bold(bold);
-                    p.Italic(italic);
-                    p.Underline(underline.ToString());
+                    p.ClearAll();
+                    p.Bold(true);
+                    if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
+                    if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
+                    //if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
+                    if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
+                }
+                else if (run.Italic != null && (run.Italic.Val == null || run.Italic.Val == true))
+                {
+                    p.ClearAll();
+                    p.Italic(true);
+                    if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
+                    if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
+                    if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
+                    if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
+                }
+                else if (run.Underline != null)
+                {
+                    string uVal = run.Underline.Val;
+                    p.ClearAll();
+                    p.Underline(uVal);
+                    if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
+                    if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
+                    if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
+                    if (_gostRepository.GetFont(typeStyle) != null) p.RunFonts(_gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle), _gostRepository.GetFont(typeStyle));
                 }
                 else
                 {
+                    p.ClearAll();
+                    if (_gostRepository.GetFontSize(typeStyle) != null) p.FontSize(_gostRepository.GetFontSize(typeStyle).SafeToInt(-1));
+                    if (_gostRepository.GetColor(typeStyle) != null) p.Color(_gostRepository.GetColor(typeStyle));
                     if (_gostRepository.GetBold(typeStyle) != null) p.Bold(_gostRepository.GetBold(typeStyle).nvl());
                     if (_gostRepository.GetItalic(typeStyle) != null) p.Italic(_gostRepository.GetItalic(typeStyle).nvl());
                     if (_gostRepository.GetUnderline(typeStyle) != null) p.Underline(_gostRepository.GetUnderline(typeStyle));
@@ -335,6 +369,31 @@ namespace ProcessDocumentCore.Processing
             p.SpacingBetweenLines(_gostRepository.GetLineSpacing(typeStyle).nvl(), _gostRepository.GetBeforeSpacing(typeStyle).nvl(), _gostRepository.GetAfterSpacing(typeStyle).nvl());
         }
 
+        private void SetHeaderPartStyle(WordprocessingDocument wDoc)
+        {
+            var paragrpahs = wDoc.MainDocumentPart.HeaderParts.FirstOrDefault().Header.Descendants<Paragraph>().ToList();
+            foreach (var p in paragrpahs)
+            {
+                SetParagraphStyle(p, CommonGost.StyleTypeEnum.HeaderPart, true);
+                foreach (var r in p.Descendants<Run>().ToList())
+                {
+                    SetRunStyle(r, CommonGost.StyleTypeEnum.HeaderPart);
+                }
+            }
+        }
+
+        private void SetFooterPartStyle(WordprocessingDocument wDoc)
+        {
+            var paragrpahs = wDoc.MainDocumentPart.FooterParts.FirstOrDefault().Footer.Descendants<Paragraph>().ToList();
+            foreach (var p in paragrpahs)
+            {
+                SetParagraphStyle(p, CommonGost.StyleTypeEnum.FooterPart, true);
+                foreach (var r in p.Descendants<Run>().ToList())
+                {
+                    SetRunStyle(r, CommonGost.StyleTypeEnum.FooterPart);
+                }
+            }
+        }
 
         private string GetPathToSaveObj()
         {
