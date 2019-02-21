@@ -118,10 +118,7 @@ namespace StandardsLibrary
             nextIndentationleft = _model.Numbering.LeftNextIndentation;
             indentationleft = _model.Numbering.LeftIndentation;
 
-            var nextLevel = (level + 1) * nextIndentationleft;
-            return level > 0
-                ? nextLevel < 1 ? indentationleft : nextLevel
-                : indentationleft;
+            return indentationleft + nextIndentationleft * level;
         }
 
         public LevelJustificationValues GetNumberingJustification(int level)
