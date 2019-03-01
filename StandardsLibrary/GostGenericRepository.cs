@@ -13,6 +13,8 @@ namespace StandardsLibrary
 
         private readonly Dictionary<int, SimpleNumberingLevel> _numberingDictionary = new Dictionary<int, SimpleNumberingLevel>();
 
+        private const int multiplier = 567; //Множитель для перевода в twip'ы
+
         public GostGenericRepository(GostModel @base)
         {
             _model = @base;
@@ -88,7 +90,7 @@ namespace StandardsLibrary
                     return _model?.FooterPart;
                 case CommonGost.StyleTypeEnum.ImageCaption:
                     return _model?.ImageCaption;
-		default:
+                default:
                     return null;
             }
         }
@@ -134,10 +136,46 @@ namespace StandardsLibrary
             else return LevelJustificationValues.Left;
         }
 
-        public float GetNumberingHanging()
-        {
-            return _model.Numbering.Hanging;
-        }
+        public float GetNumberingHanging() => _model.Numbering.Hanging;
 
+        /// <summary>
+        /// Возвращает отступ абзаца слева для данного уровня оглавления
+        /// </summary>
+        /// <param name="level">Уровень оглавления</param>
+        /// <returns>Отступ слева</returns>
+        public int GetTOCIndentationLeft(int level) => (int)((_model.TOC.LeftIndentation + _model.TOC.LeftNextIndentation * level) * multiplier);
+
+        /// <summary>
+        /// Возвращает отступ первой строки оглавления
+        /// </summary>
+        /// <returns>Отступ первой строки</returns>
+        public int GetTOCFirstIndentation() => (int)(_model.TOC.FirstLineIndentation * multiplier);
+
+        /// <summary>
+        /// Возвращает позицию табуляции оглавления
+        /// </summary>
+        /// <returns>Позиция табуляции</returns>
+        public int GetTOCTabPosition() => (int)(_model.TOC.TabPosition * multiplier);
+
+        /// <summary>
+        /// Возвращает заполнитель табуляции для оглавления
+        /// </summary>
+        /// <returns>Заполнитель табуляции</returns>
+        public TabStopLeaderCharValues GetTOCTabLeader()
+        {
+            switch (_model.TOC.TabLeader.ToLower())
+            {
+                case "none": //Без заполнителя
+                    return TabStopLeaderCharValues.None;
+                case "dot": //Точки
+                    return TabStopLeaderCharValues.Dot;
+                case "underscore": //Подчеркивание
+                    return TabStopLeaderCharValues.Underscore;
+                case "middledot": //Точки посередине
+                    return TabStopLeaderCharValues.MiddleDot;
+                default:
+                    return TabStopLeaderCharValues.None;
+            }
+        }
     }
 }
