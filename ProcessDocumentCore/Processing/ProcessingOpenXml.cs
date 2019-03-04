@@ -432,12 +432,6 @@ namespace ProcessDocumentCore.Processing
 
             if (TOC == null) return;
 
-            foreach (var tab in TOC.Descendants<TabStop>()) //Устанавливаем параметры табуляции
-            {
-                tab.Leader = _gostRepository.GetTOCTabLeader();
-                tab.Position = _gostRepository.GetTOCTabPosition();
-            }
-
             foreach (var para in TOC.Descendants<Paragraph>())
             {
                 string anchor = null;
@@ -459,6 +453,12 @@ namespace ProcessDocumentCore.Processing
                     Left = _gostRepository.GetTOCIndentationLeft(GetHeaderLevel(body, styles, anchor)).ToString(),
                     FirstLine = _gostRepository.GetTOCFirstIndentation().ToString()
                 };
+                if (para.ParagraphProperties.Tabs != null) //Устанавливаем точки между номером и заголовком и расположение номера
+                {
+                    TabStop pagenum = (TabStop)para.ParagraphProperties.Tabs.Last(t => t.GetType() == typeof(TabStop));
+                    pagenum.Leader = _gostRepository.GetTOCTabLeader();
+                    pagenum.Position = _gostRepository.GetTOCTabPosition();
+                }
             }
         }
 
