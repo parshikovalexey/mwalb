@@ -10,5 +10,6 @@ namespace StandardsLibrary
         public SimpleStyle Image { get; set; } = new SimpleStyle();
         public SimpleStyle Headline { get; set; } = new SimpleStyle();
         public SimpleNumbering Numbering { get; set;} = new SimpleNumbering();
+        public SimpleCaption Caption { get; set; } = new SimpleCaption();
     }
 }

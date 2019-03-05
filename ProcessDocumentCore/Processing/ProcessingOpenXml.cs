@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace ProcessDocumentCore.Processing
 {
@@ -97,6 +98,7 @@ namespace ProcessDocumentCore.Processing
                     }
 
                     CorrectImage(body);
+                    SetCaptionImage(body);
 
                     using (StreamWriter sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))
                     {
@@ -353,6 +355,71 @@ namespace ProcessDocumentCore.Processing
         private string GetPathToSaveObj()
         {
             return Path.GetFullPath(Path.Combine(PathHelper.TmpDirectory(), $"{Guid.NewGuid().ToString()}{ExtensionDoc}"));
+        }
+
+        private void SetCaptionImage(Body body)
+        {
+            Match headerText = null;
+            Regex Header = null;
+            int countImg = 0;
+            int throughimg = 0;
+
+            var isNextRunIsHeaderImg = false;
+            var pictureGost = _gostRepository.GetTypeCaption(0);
+
+            foreach (var para in body.Elements<Paragraph>())
+            {
+               if ((para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd)) || para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack"))
+               {
+                    Header = new Regex(@"^\d", RegexOptions.IgnoreCase);
+                    headerText = Header.Match(para.InnerText);
+                    countImg = 0;
+               }
+               if (isNextRunIsHeaderImg)
+               {
+                    foreach (var itemRun in para)
+                    {
+                        if (itemRun is Run run)
+                        {
+                            if (itemRun.Elements<FieldChar>().Any(p => p.FieldCharType == FieldCharValues.Separate) &&
+                            itemRun.Elements<FieldChar>().Any(p => p.FieldCharType != FieldCharValues.End))
+                            {
+                                // Удалить старую цифру
+                                itemRun.Remove();
+                            }
+                            switch (pictureGost)
+                            {
+                                case "through":
+                                    itemRun.Append(new Text("  " + throughimg.ToString()));
+                                    break;
+                                case "subsection":
+                                    itemRun.Append(new Text(" " + headerText.ToString() + "." + countImg.ToString()));
+                                    break;
+                            }
+                            SetRunStyle(run, CommonGost.StyleTypeEnum.Image);
+                        }
+                    }
+
+                    SetParagraphStyle(para, CommonGost.StyleTypeEnum.Image, true);
+                    isNextRunIsHeaderImg = false;
+
+                    if (!para.Any(r => r.GetType() == typeof(Run)))
+                    {
+                        para.Remove();
+                        isNextRunIsHeaderImg = true;
+                        continue;
+                    }
+               }
+
+               var findDrawing = para.Any(f => f.ToList().Any(e => e is Drawing));
+               if (findDrawing)
+               {
+                   isNextRunIsHeaderImg = true;
+                   countImg++;
+                   throughimg++;
+                   SetParagraphStyle(para, CommonGost.StyleTypeEnum.Image, true);
+               }
+            }
         }
     }
 

@@ -13,6 +13,8 @@ namespace StandardsLibrary
 
         private readonly Dictionary<int, SimpleNumberingLevel> _numberingDictionary = new Dictionary<int, SimpleNumberingLevel>();
 
+        private readonly Dictionary<int, SimpleCaptionPictureTable> captionD = new Dictionary<int, SimpleCaptionPictureTable>();
+
         public GostGenericRepository(GostModel @base)
         {
             _model = @base;
@@ -29,6 +31,13 @@ namespace StandardsLibrary
                 _numberingDictionary.Add(6, _model?.Numbering?.Level7 ?? new SimpleNumberingLevel());
                 _numberingDictionary.Add(7, _model?.Numbering?.Level8 ?? new SimpleNumberingLevel());
                 _numberingDictionary.Add(8, _model?.Numbering?.Level9 ?? new SimpleNumberingLevel());
+            }
+
+            if(captionD != null)
+            {
+                captionD.Clear();
+                captionD.Add(0, _model?.Caption?.Picture ?? new SimpleCaptionPictureTable());
+                captionD.Add(1, _model?.Caption?.Table ?? new SimpleCaptionPictureTable());
             }
 
         }
@@ -87,6 +96,10 @@ namespace StandardsLibrary
             }
         }
 
+        public string GetTypeCaption(int type)
+        {
+            return captionD[type].NumberingFormat;
+        }
 
 
         public NumberFormatValues GetNumberingFormat(int level)
