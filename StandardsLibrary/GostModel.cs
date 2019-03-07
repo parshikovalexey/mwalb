@@ -13,5 +13,6 @@ namespace StandardsLibrary
         public SimpleStyle HeaderPart { get; set; } = new SimpleStyle();
         public SimpleStyle FooterPart { get; set; } = new SimpleStyle();
         public SimpleNumbering Numbering { get; set;} = new SimpleNumbering();
+        public SimpleNumbering Bullet { get; set; } = new SimpleNumbering();
     }
 }

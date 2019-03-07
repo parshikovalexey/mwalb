@@ -12,6 +12,7 @@ namespace StandardsLibrary
         private readonly GostModel _model = null;
 
         private readonly Dictionary<int, SimpleNumberingLevel> _numberingDictionary = new Dictionary<int, SimpleNumberingLevel>();
+        private readonly Dictionary<int, SimpleNumberingLevel> _bulletDictionary = new Dictionary<int, SimpleNumberingLevel>();
 
         public GostGenericRepository(GostModel @base)
         {
@@ -30,7 +31,19 @@ namespace StandardsLibrary
                 _numberingDictionary.Add(7, _model?.Numbering?.Level8 ?? new SimpleNumberingLevel());
                 _numberingDictionary.Add(8, _model?.Numbering?.Level9 ?? new SimpleNumberingLevel());
             }
-
+            if (_model.Bullet != null)
+            {
+                _bulletDictionary.Clear();
+                _bulletDictionary.Add(0, _model?.Bullet?.Level1 ?? new SimpleNumberingLevel());
+                _bulletDictionary.Add(1, _model?.Bullet?.Level2 ?? new SimpleNumberingLevel());
+                _bulletDictionary.Add(2, _model?.Bullet?.Level3 ?? new SimpleNumberingLevel());
+                _bulletDictionary.Add(3, _model?.Bullet?.Level4 ?? new SimpleNumberingLevel());
+                _bulletDictionary.Add(4, _model?.Bullet?.Level5 ?? new SimpleNumberingLevel());
+                _bulletDictionary.Add(5, _model?.Bullet?.Level6 ?? new SimpleNumberingLevel());
+                _bulletDictionary.Add(6, _model?.Bullet?.Level7 ?? new SimpleNumberingLevel());
+                _bulletDictionary.Add(7, _model?.Bullet?.Level8 ?? new SimpleNumberingLevel());
+                _bulletDictionary.Add(8, _model?.Bullet?.Level9 ?? new SimpleNumberingLevel());
+            }
         }
 
         /// <summary>
@@ -95,15 +108,23 @@ namespace StandardsLibrary
 
 
 
-        public NumberFormatValues GetNumberingFormat(int level)
+        public NumberFormatValues GetNumberingFormat(int level, bool isBullet)
         {
-            return _numberingDictionary.ContainsKey(level) ? _numberingDictionary[level].NumberingFormat.GetNumberingFormat() : NumberFormatValues.None;
+            var dictionary = _numberingDictionary;
+            if (isBullet)
+                dictionary = _bulletDictionary;
+
+            return dictionary.ContainsKey(level) ? dictionary[level].NumberingFormat.GetNumberingFormat() : NumberFormatValues.None;
         }
-        public string GetNumberingLevelText(int level)
+        public string GetNumberingLevelText(int level, bool isBullet)
         {
-            if (_numberingDictionary.ContainsKey(level))
+            var dictionary = _numberingDictionary;
+            if (isBullet)
+                dictionary = _bulletDictionary;
+
+            if (dictionary.ContainsKey(level))
             {
-                return _numberingDictionary[level].LevelText;
+                return dictionary[level].LevelText;
             }
             else
             {
@@ -116,27 +137,41 @@ namespace StandardsLibrary
             }
         }
 
-        public float GetNumberingIndentationLeft(int level)
+        public float GetNumberingIndentationLeft(int level, bool isBullet)
         {
             float indentationleft = 1;
             float nextIndentationleft = 1;
-
-            nextIndentationleft = _model.Numbering.LeftNextIndentation;
-            indentationleft = _model.Numbering.LeftIndentation;
+            if (!isBullet)
+            {
+                nextIndentationleft = _model.Numbering.LeftNextIndentation;
+                indentationleft = _model.Numbering.LeftIndentation;
+            }
+            else
+            {
+                nextIndentationleft = _model.Bullet.LeftNextIndentation;
+                indentationleft = _model.Bullet.LeftIndentation;
+            }
 
             return indentationleft + nextIndentationleft * level;
         }
 
-        public LevelJustificationValues GetNumberingJustification(int level)
+        public LevelJustificationValues GetNumberingJustification(int level, bool isBullet)
         {
-            if (_numberingDictionary.ContainsKey(level))
-                return _numberingDictionary[level].LevelJustification.GetLevelJustificationByString();
+            var dictionary = _numberingDictionary;
+            if (isBullet)
+                dictionary = _bulletDictionary;
+
+            if (dictionary.ContainsKey(level))
+                return dictionary[level].LevelJustification.GetLevelJustificationByString();
             else return LevelJustificationValues.Left;
         }
 
-        public float GetNumberingHanging()
+        public float GetNumberingHanging(bool isBullet)
         {
-            return _model.Numbering.Hanging;
+            if (!isBullet)
+                return _model.Numbering.Hanging;
+            else
+                return _model.Bullet.Hanging;
         }
 
     }
