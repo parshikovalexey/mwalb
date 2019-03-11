@@ -19,14 +19,25 @@ namespace OpenXmlHelperLibrary
         }
         public void ClearAll()
         {
+            ParagraphStyleId styleId = null;
+            if (_paragraph?.ParagraphProperties?.ParagraphStyleId != null)
+                styleId = (ParagraphStyleId)_paragraph?.ParagraphProperties?.ParagraphStyleId.CloneNode(true);
+
             _paragraph?.ParagraphProperties?.Remove();
             _paragraph?.ParagraphProperties?.ParagraphMarkRunProperties?.Remove();
             if (_paragraph != null)
             {
-                _paragraph.ParagraphProperties = new ParagraphProperties
-                {
-                    ParagraphMarkRunProperties = new ParagraphMarkRunProperties()
-                };
+                if (styleId == null)
+                    _paragraph.ParagraphProperties = new ParagraphProperties
+                    {
+                        ParagraphMarkRunProperties = new ParagraphMarkRunProperties()
+                    };
+                else
+                    _paragraph.ParagraphProperties = new ParagraphProperties
+                    {
+                        ParagraphMarkRunProperties = new ParagraphMarkRunProperties(),
+                        ParagraphStyleId = styleId
+                    };
             }
         }
 
@@ -41,7 +52,7 @@ namespace OpenXmlHelperLibrary
         {
 
             if (string.IsNullOrEmpty(color)) return;
-          
+
             ClearSingleStyleFromMarkRunProperties(typeof(Color));
             var _color = new Color { Val = color };
             AddStyleToMarkRunProperties(_color);
@@ -198,8 +209,8 @@ namespace OpenXmlHelperLibrary
 
         public int GetNumberingLevelReference()
         {
-          var numberingLevelReference  =   _paragraph.ParagraphProperties.FirstOrDefault(element => element is NumberingLevelReference);
-          return 1;
+            var numberingLevelReference = _paragraph.ParagraphProperties.FirstOrDefault(element => element is NumberingLevelReference);
+            return 1;
         }
 
         private void AddStyleToMarkRunProperties(OpenXmlElement obj)

@@ -42,8 +42,6 @@ namespace ProcessDocumentCore.Processing
                     //устанавливаем отступы для всего документа
                     SetPageMargin(body);
 
-                    var isHeader = false;
-
                     foreach (var para in body.Elements<Paragraph>())
                     {
                         var isNeedClearProperty = true;
@@ -72,8 +70,6 @@ namespace ProcessDocumentCore.Processing
                                     SetRunStyle(openXmlElement, CommonGost.StyleTypeEnum.Headline);
                                 }
                             }
-
-
                         }
 
 
@@ -100,6 +96,8 @@ namespace ProcessDocumentCore.Processing
                     SetHeaderPartStyle(wordDoc);
                     SetFooterPartStyle(wordDoc);
 
+                    SetTOCStyle(body, wordDoc.MainDocumentPart.StyleDefinitionsPart.Styles);
+
                     using (StreamWriter sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))
                     {
                         sw.Write(docText);
@@ -121,7 +119,6 @@ namespace ProcessDocumentCore.Processing
         private void SetNumberingProperties(Paragraph para, WordprocessingDocument wordDoc)
         {
             //Все стили для списка хранятся в AbstractNum основного документа и связанны цепочкой ParagraphProperties.NumberingId -> MainDocumentPart.NumberingInstance.Val -> AbstractNum.AbstractNumberId
-
             var numId = para.ParagraphProperties.FirstOrDefault(p => p.GetType() == typeof(NumberingProperties)).ToList()
                 .FirstOrDefault(p => p.GetType() == typeof(NumberingId));
 
@@ -376,6 +373,91 @@ namespace ProcessDocumentCore.Processing
                 foreach (var r in p.Descendants<Run>().ToList())
                 {
                     SetRunStyle(r, CommonGost.StyleTypeEnum.FooterPart);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Возвращает блок оглавления из тела документа
+        /// </summary>
+        /// <param name="body">Тело документа</param>
+        /// <returns>Блок оглавления</returns>
+        private SdtBlock GetTOC(Body body)
+        {
+            var blocks = body.Descendants<SdtBlock>();
+            foreach (var block in blocks)
+            {
+                SdtContentDocPartObject docpartobj = (SdtContentDocPartObject)block.SdtProperties.FirstOrDefault(e => e.GetType() == typeof(SdtContentDocPartObject));
+                if (docpartobj.DocPartGallery.Val == "Table of Contents") return block;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Возвращает уровень пункта оглавления в документе по ссылке
+        /// </summary>
+        /// <param name="body">Тело документа</param>
+        /// <param name="styles">Стили документа</param>
+        /// <param name="anchor">Ссылка на абзац с заголовком</param>
+        /// <returns>Уровень пункта оглавления</returns>
+        private int GetHeaderLevel(Body body, Styles styles, string anchor)
+        {
+            int level = 1;
+            if (anchor == null) return level - 1;
+            foreach (var bookmark in body.Descendants<BookmarkStart>())
+            {
+                if (bookmark.Name == anchor)
+                {
+                    var paragraph = (Paragraph)bookmark.Parent;
+                    var styleId = paragraph.ParagraphProperties.ParagraphStyleId.Val.ToString();
+                    foreach (var style in styles.Descendants<Style>())
+                    {
+                        if (style.StyleId == styleId)
+                        {
+                            var name = style.StyleName.Val.ToString();
+                            if (name.Contains("heading")) int.TryParse(name.Substring(name.Length - 1), out level);
+                        }
+                    }
+                }
+            }
+            return level - 1;
+        }
+
+        /// <summary>
+        /// Задает форматирование оглавления (Table of Contents)
+        /// </summary>
+        private void SetTOCStyle(Body body, Styles styles)
+        {
+            var TOC = GetTOC(body);
+
+            if (TOC == null) return;
+
+            foreach (var para in TOC.Descendants<Paragraph>())
+            {
+                string anchor = null;
+
+                if (para.Descendants<Hyperlink>().Any()) //Ищем ссылку на заголовок
+                {
+                    var hyperlink = para.Descendants<Hyperlink>().FirstOrDefault();
+                    anchor = hyperlink.Anchor;
+                }
+                else if (para.Descendants<FieldCode>().Any(f => f.Text.ToLower().Contains("hyperlink")))
+                {
+                    var field = para.Descendants<FieldCode>().FirstOrDefault(f => f.Text.ToLower().Contains("hyperlink"));
+                    anchor = field.Text.Substring(field.Text.IndexOf('\"') + 1, field.Text.Length - field.Text.IndexOf('\"') - 2);
+                }
+
+                if (para.ParagraphProperties == null) para.ParagraphProperties = new ParagraphProperties();
+                para.ParagraphProperties.Indentation = new Indentation()
+                {
+                    Left = _gostRepository.GetTOCIndentationLeft(GetHeaderLevel(body, styles, anchor)).ToString(),
+                    FirstLine = _gostRepository.GetTOCFirstIndentation().ToString()
+                };
+                if (para.ParagraphProperties.Tabs != null) //Устанавливаем точки между номером и заголовком и расположение номера
+                {
+                    TabStop pagenum = (TabStop)para.ParagraphProperties.Tabs.Last(t => t.GetType() == typeof(TabStop));
+                    pagenum.Leader = _gostRepository.GetTOCTabLeader();
+                    pagenum.Position = _gostRepository.GetTOCTabPosition();
                 }
             }
         }
