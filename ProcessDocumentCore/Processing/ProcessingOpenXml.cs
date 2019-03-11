@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace ProcessDocumentCore.Processing
 {
@@ -41,6 +42,9 @@ namespace ProcessDocumentCore.Processing
 
                     //устанавливаем отступы для всего документа
                     SetPageMargin(body);
+
+                    var isHeader = false;
+                    List<int> formattedNumID = new List<int>(); //Список с id отформатированных списков
 
                     foreach (var para in body.Elements<Paragraph>())
                     {
@@ -88,7 +92,7 @@ namespace ProcessDocumentCore.Processing
                         }
                         //Делаем форматирование списков после того, как основной текст отформатирован
                         if (isNumberingParagraph)
-                            SetNumberingProperties(para, wordDoc);
+                            SetNumberingProperties(para, wordDoc, formattedNumID);
                     }
 
                     CorrectImage(body);
@@ -116,7 +120,7 @@ namespace ProcessDocumentCore.Processing
             }
         }
 
-        private void SetNumberingProperties(Paragraph para, WordprocessingDocument wordDoc)
+        private void SetNumberingProperties(Paragraph para, WordprocessingDocument wordDoc, IList<int> ids)
         {
             //Все стили для списка хранятся в AbstractNum основного документа и связанны цепочкой ParagraphProperties.NumberingId -> MainDocumentPart.NumberingInstance.Val -> AbstractNum.AbstractNumberId
             var numId = para.ParagraphProperties.FirstOrDefault(p => p.GetType() == typeof(NumberingProperties)).ToList()
@@ -130,6 +134,9 @@ namespace ProcessDocumentCore.Processing
             if (numId is NumberingId num)
             {
                 int v = -1;
+
+                if (ids.Any(i => i == num.Val)) return; // Если список уже форматировался выходим
+                else ids.Add(num.Val); //Иначе добавляем список в отформатированные
 
                 var instances = wordDoc.MainDocumentPart.NumberingDefinitionsPart.Numbering.ToList()
                     .Where(p => p is NumberingInstance);
@@ -149,23 +156,28 @@ namespace ProcessDocumentCore.Processing
                 var abs = wordDoc.MainDocumentPart.NumberingDefinitionsPart.Numbering.ToList()
                     .Where(p => p is AbstractNum);
 
-                foreach (var item in abs)
+                foreach (var item in abs.ToList())
                 {
                     if (item is AbstractNum an)
                     {
                         if (an.AbstractNumberId == v)
                         {
                             var levels = an.Where(e => e is Level);
+                            bool isBulletList = false;
                             foreach (var itemLevel in levels)
                             {
                                 if (itemLevel is Level level)
                                 {
+                                    if (level.LevelIndex == 0)
+                                    {
+                                        if (level.NumberingFormat.Val == NumberFormatValues.Bullet) isBulletList = true;
+                                    }
 
-                                    var numberingFormat = _gostRepository.GetNumberingFormat(level.LevelIndex);
-                                    var levelText = _gostRepository.GetNumberingLevelText(level.LevelIndex);
+                                    var numberingFormat = _gostRepository.GetNumberingFormat(level.LevelIndex, isBulletList);
+                                    var levelText = _gostRepository.GetNumberingLevelText(level.LevelIndex, isBulletList);
 
-                                    SetlevelIndentation(level);
-                                    SetLevelJustification(level);
+                                    SetlevelIndentation(level, isBulletList);
+                                    SetLevelJustification(level, isBulletList);
 
                                     if (numberingFormat != NumberFormatValues.None)
                                     {
@@ -194,6 +206,7 @@ namespace ProcessDocumentCore.Processing
                                             { Hint = FontTypeHintValues.Default, Ascii = "Symbol", HighAnsi = "Symbol" };
 
                                             prop.Append(runFonts1);
+                                            level.Append(prop);
                                         }
                                     }
                                 }
@@ -204,7 +217,7 @@ namespace ProcessDocumentCore.Processing
             }
         }
 
-        private void SetlevelIndentation(Level level)
+        private void SetlevelIndentation(Level level, bool isBullet)
         {
             var paragraphProperties = level?.PreviousParagraphProperties;
             var indentation = paragraphProperties?.FirstOrDefault(p =>
@@ -213,17 +226,17 @@ namespace ProcessDocumentCore.Processing
             if (indentation != null && indentation is Indentation levelIndentation)
             {
                 levelIndentation.Left =
-                    ((int)(_gostRepository.GetNumberingIndentationLeft(level.LevelIndex) * multiplier)).ToString();
-                levelIndentation.Hanging = ((int)(_gostRepository.GetNumberingHanging() * multiplier)).ToString();
+                    ((int)(_gostRepository.GetNumberingIndentationLeft(level.LevelIndex, isBullet) * multiplier)).ToString();
+                levelIndentation.Hanging = ((int)(_gostRepository.GetNumberingHanging(isBullet) * multiplier)).ToString();
             }
         }
 
-        private void SetLevelJustification(Level level)
+        private void SetLevelJustification(Level level, bool isBullet)
         {
             var justification = level.LevelJustification;
             if (justification != null)
             {
-                justification.Val = _gostRepository.GetNumberingJustification(level.LevelIndex);
+                justification.Val = _gostRepository.GetNumberingJustification(level.LevelIndex, isBullet);
             }
         }
 
