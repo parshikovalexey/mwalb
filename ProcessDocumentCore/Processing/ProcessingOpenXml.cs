@@ -42,8 +42,6 @@ namespace ProcessDocumentCore.Processing
 
                     //устанавливаем отступы для всего документа
                     SetPageMargin(body);
-
-                    var isHeader = false;
                     List<int> formattedNumID = new List<int>(); //Список с id отформатированных списков
 
                     foreach (var para in body.Elements<Paragraph>())
@@ -407,6 +405,22 @@ namespace ProcessDocumentCore.Processing
         }
 
         /// <summary>
+        /// Возвращает стиль абзаца из списка стилей документа или null
+        /// </summary>
+        /// <param name="para">Абзац</param>
+        /// <param name="styles">Стили документа</param>
+        /// <returns>Стиль абзаца</returns>
+        private Style GetParagraphStyle(Paragraph para, Styles styles)
+        {
+            if (para?.ParagraphProperties?.ParagraphStyleId == null) return null;
+
+            var styleid = para?.ParagraphProperties?.ParagraphStyleId.Val;
+            var style = styles.Descendants<Style>().FirstOrDefault(s => s.StyleId.Value == styleid.Value);
+
+            return style ?? null;
+        }
+
+        /// <summary>
         /// Возвращает уровень пункта оглавления в документе по ссылке
         /// </summary>
         /// <param name="body">Тело документа</param>
@@ -423,14 +437,10 @@ namespace ProcessDocumentCore.Processing
                 {
                     var paragraph = (Paragraph)bookmark.Parent;
                     var styleId = paragraph.ParagraphProperties.ParagraphStyleId.Val.ToString();
-                    foreach (var style in styles.Descendants<Style>())
-                    {
-                        if (style.StyleId == styleId)
-                        {
-                            var name = style.StyleName.Val.ToString();
-                            if (name.Contains("heading")) int.TryParse(name.Substring(name.Length - 1), out level);
-                        }
-                    }
+
+                    var name = GetParagraphStyle(paragraph, styles).StyleName.Val.ToString();
+                    if (name.Contains("heading")) int.TryParse(name.Substring(name.Length - 1), out level);
+
                 }
             }
             return level - 1;
@@ -447,9 +457,12 @@ namespace ProcessDocumentCore.Processing
 
             foreach (var para in TOC.Descendants<Paragraph>())
             {
-                string anchor = null;
+                if (para.ParagraphProperties == null) para.ParagraphProperties = new ParagraphProperties();
+                var style = GetParagraphStyle(para, styles);
 
-                if (para.Descendants<Hyperlink>().Any()) //Ищем ссылку на заголовок
+                //Ищем ссылку на заголовок
+                string anchor = null;
+                if (para.Descendants<Hyperlink>().Any())
                 {
                     var hyperlink = para.Descendants<Hyperlink>().FirstOrDefault();
                     anchor = hyperlink.Anchor;
@@ -460,18 +473,57 @@ namespace ProcessDocumentCore.Processing
                     anchor = field.Text.Substring(field.Text.IndexOf('\"') + 1, field.Text.Length - field.Text.IndexOf('\"') - 2);
                 }
 
-                if (para.ParagraphProperties == null) para.ParagraphProperties = new ParagraphProperties();
+                //Устанавливаем расположение табов
+                if (para.ParagraphProperties.Tabs != null || style?.StyleParagraphProperties?.Tabs != null)
+                {
+                    Tabs tabs = para.ParagraphProperties.Tabs ?? style.StyleParagraphProperties.Tabs;
+                    tabs.Descendants<TabStop>().Last().Remove();
+
+                    if (tabs.Count() > 0)
+                    {
+                        foreach (var tab in tabs.Descendants<TabStop>().ToList())
+                        {
+                            int ind = 0;
+                            if (para.ParagraphProperties.Indentation?.Left != null)
+                            {
+                                ind = Int32.Parse(para.ParagraphProperties.Indentation.Left);
+                            }
+                            else if (style.StyleParagraphProperties?.Indentation?.Left != null)
+                            {
+                                ind = Int32.Parse(style.StyleParagraphProperties?.Indentation?.Left);
+                            }
+
+                            int position = tab.Position - ind;
+                            tab.Position = _gostRepository.GetTOCIndentationLeft(GetHeaderLevel(body, styles, anchor)) + position;
+                        }
+                    }
+
+                    TabStop pagenum = new TabStop()
+                    {
+                        Leader = _gostRepository.GetTOCTabLeader(),
+                        Position = _gostRepository.GetTOCTabPosition(),
+                        Val = TabStopValues.Right
+                    };
+                    tabs.Append(pagenum);
+                }
+                else
+                {
+                    Tabs tabs = new Tabs();
+                    tabs.Append(new TabStop()
+                    {
+                        Leader = _gostRepository.GetTOCTabLeader(),
+                        Position = _gostRepository.GetTOCTabPosition(),
+                        Val = TabStopValues.Right
+                    });
+                    para.ParagraphProperties.Append(tabs);
+                }
+
+                //Устанавливаем отступы
                 para.ParagraphProperties.Indentation = new Indentation()
                 {
                     Left = _gostRepository.GetTOCIndentationLeft(GetHeaderLevel(body, styles, anchor)).ToString(),
                     FirstLine = _gostRepository.GetTOCFirstIndentation().ToString()
                 };
-                if (para.ParagraphProperties.Tabs != null) //Устанавливаем точки между номером и заголовком и расположение номера
-                {
-                    TabStop pagenum = (TabStop)para.ParagraphProperties.Tabs.Last(t => t.GetType() == typeof(TabStop));
-                    pagenum.Leader = _gostRepository.GetTOCTabLeader();
-                    pagenum.Position = _gostRepository.GetTOCTabPosition();
-                }
             }
         }
 
