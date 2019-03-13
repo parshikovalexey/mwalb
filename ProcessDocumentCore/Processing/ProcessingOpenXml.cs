@@ -99,6 +99,7 @@ namespace ProcessDocumentCore.Processing
 
                     CorrectImage(body);
                     SetCaptionImage(body);
+                    SetCaptionTable(body);
 
                     using (StreamWriter sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))
                     {
@@ -360,9 +361,12 @@ namespace ProcessDocumentCore.Processing
         private void SetCaptionImage(Body body)
         {
             Match headerText = null;
-            Regex Header = null;
+            Regex HeaderSection = null;
+            
             int countImg = 0;
             int throughimg = 0;
+            int n;
+            string parsCaptio = null;
 
             var isNextRunIsHeaderImg = false;
             var pictureGost = _gostRepository.GetTypeCaption(0);
@@ -370,9 +374,13 @@ namespace ProcessDocumentCore.Processing
             foreach (var para in body.Elements<Paragraph>())
             {
                if ((para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd)) || para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack"))
-               {
-                    Header = new Regex(@"^\d", RegexOptions.IgnoreCase);
-                    headerText = Header.Match(para.InnerText);
+                {
+                    //\b(\d +\S *)?
+                    //\b(\w)\b
+                    //\w\S*
+                    HeaderSection = new Regex(@"\b(\w)\b", RegexOptions.IgnoreCase);
+                    headerText = HeaderSection.Match(para.InnerText);
+                    
                     countImg = 0;
                }
                if (isNextRunIsHeaderImg)
@@ -381,22 +389,20 @@ namespace ProcessDocumentCore.Processing
                     {
                         if (itemRun is Run run)
                         {
-                            if (itemRun.Elements<FieldChar>().Any(p => p.FieldCharType == FieldCharValues.Separate) &&
-                            itemRun.Elements<FieldChar>().Any(p => p.FieldCharType != FieldCharValues.End))
-                            {
-                                // Удалить старую цифру
+                            // Удалить старую цифру
+                            if (int.TryParse(itemRun.InnerText, out n))
                                 itemRun.Remove();
-                            }
                             switch (pictureGost)
                             {
                                 case "through":
                                     itemRun.Append(new Text("  " + throughimg.ToString()));
                                     break;
-                                case "subsection":
-                                    itemRun.Append(new Text(" " + headerText.ToString() + "." + countImg.ToString()));
+                                case "section":
+                                    itemRun.Append(new Text(" " + headerText.Value + "." + countImg.ToString()));
                                     break;
+
                             }
-                            SetRunStyle(run, CommonGost.StyleTypeEnum.Image);
+                            //SetRunStyle(run, CommonGost.StyleTypeEnum.Image);
                         }
                     }
 
@@ -415,12 +421,80 @@ namespace ProcessDocumentCore.Processing
                if (findDrawing)
                {
                    isNextRunIsHeaderImg = true;
+
                    countImg++;
                    throughimg++;
                    SetParagraphStyle(para, CommonGost.StyleTypeEnum.Image, true);
                }
             }
         }
+        
+        private void SetCaptionTable(Body body)
+        {
+            Match headerText = null;
+            Regex Header = null;
+
+            int countTabl = 0;
+            int throughTabl = 0;
+            int n;
+
+            var isNextRunIsHeaderTab = false;
+            var tableGost = _gostRepository.GetTypeCaption(1);
+
+            foreach (var para in body.ToList())
+            {
+                if ((para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd)) || para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack"))
+                {
+                    Header = new Regex(@"\b(\w)\b", RegexOptions.IgnoreCase);
+                    headerText = Header.Match(para.InnerText);
+
+                    countTabl = 0;
+                }
+                if (para is Paragraph pr)
+                {
+                    if (isNextRunIsHeaderTab)
+                    {
+                        foreach (var itemRun in para)
+                        {
+                            if (itemRun is Run run)
+                            {
+                                //// Удалить старую цифру
+                                if (int.TryParse(itemRun.InnerText, out n))
+                                    itemRun.Remove();
+                                switch (tableGost)
+                                {
+                                    case "through":
+                                        itemRun.Append(new Text("  " + throughTabl.ToString()));
+                                        break;
+                                    case "section":
+                                        itemRun.Append(new Text(" " + headerText.Value + "." + countTabl.ToString()));
+                                        break;
+                                }
+                                SetRunStyle(run, CommonGost.StyleTypeEnum.Image);
+                            }
+                        }
+
+                        SetParagraphStyle(pr, CommonGost.StyleTypeEnum.Image, true);
+                        isNextRunIsHeaderTab = false;
+
+                        if (!para.Any(r => r.GetType() == typeof(Run)))
+                        {
+                            para.Remove();
+                            isNextRunIsHeaderTab = true;
+                            continue;
+                        }
+                    }
+                    
+                }
+                if (para is Table)
+                {
+                    isNextRunIsHeaderTab = true;
+                    countTabl++;
+                    throughTabl++;
+                    //SetParagraphStyle(para, CommonGost.StyleTypeEnum.Image, true);
+                }
+            }  
+        }   
     }
 
 }
