@@ -17,6 +17,8 @@ namespace ProcessDocumentCore.Processing
     public class ProcessingOpenXml : IDocumentProcessing
     {
         private const string ExtensionDoc = ".docx";
+        private GostGenericRepository<GostModel> _gostRepository;
+
         public ResultExecute Processing(GostModel gostModel, string filePath)
         {
 
@@ -39,6 +41,7 @@ namespace ProcessDocumentCore.Processing
                     }
 
                     var body = wordDoc.MainDocumentPart.Document.Body;
+                    var styles = wordDoc.MainDocumentPart.StyleDefinitionsPart.Styles;
 
                     //устанавливаем отступы для всего документа
                     SetPageMargin(body);
@@ -56,8 +59,8 @@ namespace ProcessDocumentCore.Processing
                         }
                         else
                         {
-
-                            if ((para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd)) || para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack"))
+                            //Определение заголовков
+                            if (IsParagraphHeader(para, styles))
                             {
                                 foreach (var openXmlElement1 in para.ToList().Where(x => x is Run).ToList())
                                 {
@@ -98,7 +101,7 @@ namespace ProcessDocumentCore.Processing
                     SetHeaderPartStyle(wordDoc);
                     SetFooterPartStyle(wordDoc);
 
-                    SetTOCStyle(body, wordDoc.MainDocumentPart.StyleDefinitionsPart.Styles);
+                    SetTOCStyle(body, styles);
 
                     using (StreamWriter sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))
                     {
@@ -116,6 +119,21 @@ namespace ProcessDocumentCore.Processing
                 stream?.Close();
                 return new ResultExecute().OnError(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Возвращает true, если абзац является заголовком
+        /// </summary>
+        /// <param name="paragraph">Абзац для проверки</param>
+        /// <param name="styles">Стили документа</param>
+        private bool IsParagraphHeader(Paragraph paragraph, Styles styles)
+        {
+            var style = GetParagraphStyle(paragraph, styles);
+            string stylename = style != null ? style.StyleName.Val.ToString().ToLower() : null;
+
+            if (stylename != null && stylename.Contains("heading")) return true;
+
+            return false;
         }
 
         private void SetNumberingProperties(Paragraph para, WordprocessingDocument wordDoc, IList<int> ids)
@@ -302,9 +320,6 @@ namespace ProcessDocumentCore.Processing
 
         }
 
-
-        private GostGenericRepository<GostModel> _gostRepository;
-
         private void CorrectImage(Body body)
         {
             if (body == null) return;
@@ -342,7 +357,6 @@ namespace ProcessDocumentCore.Processing
             }
         }
 
-
         private void SetParagraphStyle(Paragraph para, CommonGost.StyleTypeEnum typeStyle, bool clearAllProperties)
         {
 
@@ -376,7 +390,7 @@ namespace ProcessDocumentCore.Processing
 
         private void SetFooterPartStyle(WordprocessingDocument wDoc)
         {
-            if (!wDoc.MainDocumentPart.HeaderParts.Any()) return;
+            if (!wDoc.MainDocumentPart.FooterParts.Any()) return;
             var paragrpahs = wDoc.MainDocumentPart.FooterParts.FirstOrDefault().Footer.Descendants<Paragraph>().ToList();
             foreach (var p in paragrpahs)
             {
