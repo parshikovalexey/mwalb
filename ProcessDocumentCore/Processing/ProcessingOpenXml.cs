@@ -7,6 +7,7 @@ using OpenXmlHelperLibrary;
 using ProcessDocumentCore.Interface;
 using StandardsLibrary;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -360,13 +361,13 @@ namespace ProcessDocumentCore.Processing
 
         private void SetCaptionImage(Body body)
         {
-            Match headerText = null;
-            Regex HeaderSection = null;
-            
+            List<string> headerText = new List<string>();
+            string chapter = "";
+            string chapterSection = "";
+
             int countImg = 0;
             int throughimg = 0;
-            int n;
-            string parsCaptio = null;
+            int countImgSection = 0;
 
             var isNextRunIsHeaderImg = false;
             var pictureGost = _gostRepository.GetTypeCaption(0);
@@ -376,33 +377,46 @@ namespace ProcessDocumentCore.Processing
                if ((para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd)) || para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack"))
                 {
                     //\b(\d +\S *)?
+                    //^\b(\w ?\S)\b
                     //\b(\w)\b
                     //\w\S*
-                    HeaderSection = new Regex(@"\b(\w)\b", RegexOptions.IgnoreCase);
-                    headerText = HeaderSection.Match(para.InnerText);
-                    
-                    countImg = 0;
-               }
+                    chapter = "";
+                    headerText = Regex.Matches(para.InnerText, @"\b(\w)\b").Cast<Match>().Select(m => m.Value).ToList();
+                    if (headerText.Count > 0)
+                    {
+                        foreach (string s in headerText) chapter += s + ".";
+                        countImg = 0;
+
+                        if (chapterSection != headerText[0])
+                        {
+                            chapterSection = headerText[0] + ".";
+                            countImgSection = 0;
+                        }                            
+                    }                    
+                }
                if (isNextRunIsHeaderImg)
                {
                     foreach (var itemRun in para)
                     {
                         if (itemRun is Run run)
                         {
-                            // Удалить старую цифру
-                            if (int.TryParse(itemRun.InnerText, out n))
-                                itemRun.Remove();
                             switch (pictureGost)
                             {
-                                case "through":
-                                    itemRun.Append(new Text("  " + throughimg.ToString()));
+                                case "through":                                   
+                                    itemRun.Append(new Text(new Regex(@"\d", RegexOptions.IgnoreCase).
+                                        Replace(itemRun.InnerText, throughimg.ToString())));
                                     break;
                                 case "section":
-                                    itemRun.Append(new Text(" " + headerText.Value + "." + countImg.ToString()));
+                                    itemRun.Append(new Text(new Regex(@"\d", RegexOptions.IgnoreCase).
+                                        Replace(itemRun.InnerText, chapterSection + countImgSection.ToString())));
+                                    break;
+                                case "subsection":
+                                    itemRun.Append(new Text(new Regex(@"\d", RegexOptions.IgnoreCase).
+                                        Replace(itemRun.InnerText, chapter + countImg.ToString())));
                                     break;
 
                             }
-                            //SetRunStyle(run, CommonGost.StyleTypeEnum.Image);
+                            SetRunStyle(run, CommonGost.StyleTypeEnum.Image);
                         }
                     }
 
@@ -421,7 +435,7 @@ namespace ProcessDocumentCore.Processing
                if (findDrawing)
                {
                    isNextRunIsHeaderImg = true;
-
+                   countImgSection++;
                    countImg++;
                    throughimg++;
                    SetParagraphStyle(para, CommonGost.StyleTypeEnum.Image, true);
