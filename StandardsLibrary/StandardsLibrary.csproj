@@ -52,6 +52,7 @@
     <Compile Include="GostService.cs" />
     <Compile Include="GostTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Simple\SimpleImageCaption.cs" />
     <Compile Include="Simple\SimpleTOC.cs" />
     <Compile Include="Simple\SimpleGost.cs" />
     <Compile Include="Simple\SimpleHeaderGost.cs" />
