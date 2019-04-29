@@ -102,7 +102,7 @@ namespace StandardsLibrary
                 case CommonGost.StyleTypeEnum.FooterPart:
                     return _model?.FooterPart;
                 case CommonGost.StyleTypeEnum.ImageCaption:
-                    return _model?.ImageCaption;
+                    return _model?.ImageCaption.Style;
                 default:
                     return null;
             }
@@ -163,7 +163,7 @@ namespace StandardsLibrary
             if (isBullet)
                 dictionary = _bulletDictionary;
 
-            if (dictionary.ContainsKey(level))
+            if (dictionary.ContainsKey(level) && dictionary[level].LevelJustification != null)
                 return dictionary[level].LevelJustification.GetLevelJustificationByString();
             else return LevelJustificationValues.Left;
         }
@@ -177,7 +177,7 @@ namespace StandardsLibrary
         }
 
 
-	/// <summary>
+        /// <summary>
         /// Возвращает отступ абзаца слева для данного уровня оглавления
         /// </summary>
         /// <param name="level">Уровень оглавления</param>
@@ -215,6 +215,16 @@ namespace StandardsLibrary
                 default:
                     return TabStopLeaderCharValues.None;
             }
+        }
+
+        public string GetImageCaptionFormat()
+        {
+            return _model.ImageCaption.Format ?? SimpleImageCaption.NumberingEnum.Section.ToString();
+        }
+
+        public int GetImageCaptionRule()
+        {
+            return _model.ImageCaption.Rule;
         }
     }
 }

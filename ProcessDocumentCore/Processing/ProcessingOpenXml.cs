@@ -17,6 +17,8 @@ namespace ProcessDocumentCore.Processing
     public class ProcessingOpenXml : IDocumentProcessing
     {
         private const string ExtensionDoc = ".docx";
+        private GostGenericRepository<GostModel> _gostRepository;
+
         public ResultExecute Processing(GostModel gostModel, string filePath)
         {
 
@@ -39,11 +41,10 @@ namespace ProcessDocumentCore.Processing
                     }
 
                     var body = wordDoc.MainDocumentPart.Document.Body;
+                    var styles = wordDoc.MainDocumentPart.StyleDefinitionsPart.Styles;
 
                     //устанавливаем отступы для всего документа
                     SetPageMargin(body);
-
-                    var isHeader = false;
                     List<int> formattedNumID = new List<int>(); //Список с id отформатированных списков
 
                     foreach (var para in body.Elements<Paragraph>())
@@ -56,10 +57,10 @@ namespace ProcessDocumentCore.Processing
                             isNumberingParagraph = true;
                             isNeedClearProperty = false;
                         }
-                        else
-                        {
-
-                            if ((para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack") && para.ToList().Any(p => p is BookmarkEnd)) || para.Elements<BookmarkStart>().Any(p => p.Name != "_GoBack"))
+                        //else
+                        //{
+                            //Определение заголовков
+                            if (IsParagraphHeader(para, styles))
                             {
                                 foreach (var openXmlElement1 in para.ToList().Where(x => x is Run).ToList())
                                 {
@@ -74,7 +75,7 @@ namespace ProcessDocumentCore.Processing
                                     SetRunStyle(openXmlElement, CommonGost.StyleTypeEnum.Headline);
                                 }
                             }
-                        }
+                        //}
 
 
                         if (isNeedChangeStyleForParagraph)
@@ -95,12 +96,16 @@ namespace ProcessDocumentCore.Processing
                             SetNumberingProperties(para, wordDoc, formattedNumID);
                     }
 
-                    CorrectImage(body);
+                    CorrectImage(body, styles, _gostRepository.GetImageCaptionFormat(), _gostRepository.GetImageCaptionRule());
 
                     SetHeaderPartStyle(wordDoc);
                     SetFooterPartStyle(wordDoc);
 
-                    SetTOCStyle(body, wordDoc.MainDocumentPart.StyleDefinitionsPart.Styles);
+                    SetTOCStyle(body, styles);
+
+                    DocumentSettingsPart settingsPart = wordDoc.MainDocumentPart.DocumentSettingsPart;
+                    UpdateFieldsOnOpen update = new UpdateFieldsOnOpen() { Val = true };
+                    settingsPart.Settings.PrependChild(update);
 
                     using (StreamWriter sw = new StreamWriter(wordDoc.MainDocumentPart.GetStream(FileMode.Create)))
                     {
@@ -118,6 +123,23 @@ namespace ProcessDocumentCore.Processing
                 stream?.Close();
                 return new ResultExecute().OnError(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Возвращает true, если абзац является заголовком
+        /// </summary>
+        /// <param name="paragraph">Абзац для проверки</param>
+        /// <param name="styles">Стили документа</param>
+        private bool IsParagraphHeader(Paragraph paragraph, Styles styles)
+        {
+            if (paragraph?.ParagraphProperties?.OutlineLevel != null) return true;
+
+            var style = GetParagraphStyle(paragraph, styles);
+            string stylename = style != null ? style.StyleName.Val.ToString().ToLower() : null;
+
+            if (stylename != null && stylename.Contains("heading")) return true;
+
+            return false;
         }
 
         private void SetNumberingProperties(Paragraph para, WordprocessingDocument wordDoc, IList<int> ids)
@@ -304,25 +326,36 @@ namespace ProcessDocumentCore.Processing
 
         }
 
+        //private AbstractNum GetAbstractNumByNumId(int numid, Numbering numbering)
+        //{
+        //    int abstractid = -1;
+        //    foreach (var numInst in numbering.Descendants<NumberingInstance>().ToList())
+        //    {
+        //        if (numInst.NumberID == numid) abstractid = numInst.AbstractNumId.Val;
+        //    }
 
-        private GostGenericRepository<GostModel> _gostRepository;
+        //    if (abstractid != -1)
+        //    {
+        //        foreach (var abNum in numbering.Descendants<AbstractNum>().ToList())
+        //        {
+        //            if (abNum.AbstractNumberId == abstractid) return abNum;
+        //        }
+        //    }
+        //    return null;
+        //}
 
-        private void CorrectImage(Body body)
+        private void CorrectImage(Body body, Styles styles, string format, int rule)
         {
             if (body == null) return;
 
             var isNextRunIsHeaderImg = false;
 
+            int image_number = 1;
+
             foreach (var item in body.Elements<Paragraph>().ToList())
             {
                 if (isNextRunIsHeaderImg)
                 {
-                    foreach (var itemRun in item)
-                    {
-                        if (itemRun is Run run) SetRunStyle(run, CommonGost.StyleTypeEnum.ImageCaption);
-                    }
-
-                    SetParagraphStyle(item, CommonGost.StyleTypeEnum.Image, true);
                     isNextRunIsHeaderImg = false;
 
                     if (!item.Any(r => r.GetType() == typeof(Run)))
@@ -331,6 +364,60 @@ namespace ProcessDocumentCore.Processing
                         isNextRunIsHeaderImg = true;
                         continue;
                     }
+
+                    Text text1 = new Text() { Space = SpaceProcessingModeValues.Preserve };
+                    Text text2 = new Text() { Space = SpaceProcessingModeValues.Preserve };
+
+                    //Переписываем весь текст из параграфа в одну переменную
+                    foreach (var t in item.Descendants<Text>().ToList())
+                    {
+                        text1.Text += t.Text;
+                    }
+
+                    //Находим в переменной с текстом позицию номера и количество цифр
+                    int pos = -1, count = -1;
+                    for (int i = 0; i < text1.Text.Length; i++)
+                    {
+                        if (Char.IsNumber(text1.Text[i]))
+                        {
+                            if (pos == -1)
+                            {
+                                pos = i;
+                                count = 1;
+                            }
+                            else count++;
+                        }
+                        if (text1.Text.Substring(0, i).ToLower().Contains("рисунок ") && pos == -1) pos = i;
+                    }
+
+                    //Удаляем номер
+                    if (pos != -1)
+                    {
+                        if (count != -1)
+                            text1.Text = text1.Text.Remove(pos, count);
+                        text2.Text = text1.Text.Substring(pos);
+                        text1.Text = text1.Text.Remove(pos);
+                    }
+
+                    string stylename = GetHeadlineStyleName(item, body, styles);
+                    Run run1 = new Run(text1);
+                    Run run2 = new Run(text2);
+
+                    //Записываем в параграф
+                    item.RemoveAllChildren<Run>();
+                    item.Append(run1);
+
+                    //
+                    InsertImageNumber(item, stylename, format, rule);
+
+                    item.Append(run2);
+
+                    foreach (var r in item.Descendants<Run>().ToList())
+                    {
+                        SetRunStyle(r, CommonGost.StyleTypeEnum.ImageCaption);
+                    }
+
+                    SetParagraphStyle(item, CommonGost.StyleTypeEnum.Image, true);
                 }
 
                 var findDrawing = item.Any(f => f.ToList().Any(e => e is Drawing));
@@ -344,6 +431,50 @@ namespace ProcessDocumentCore.Processing
             }
         }
 
+        private void InsertImageNumber(Paragraph item, string stylename, string format, int rule)
+        {
+            if (format.ToLower() != "section" && format.ToLower() != "simple") return;
+
+            Run runbegin = new Run();
+            FieldChar fieldCharBegin = new FieldChar() { FieldCharType = FieldCharValues.Begin, Dirty = true };
+            runbegin.Append(fieldCharBegin);
+
+            Run runseparate = new Run();
+            FieldChar fieldCharSeparate = new FieldChar() { FieldCharType = FieldCharValues.Separate };
+            runseparate.Append(fieldCharSeparate);
+
+            Run runend = new Run();
+            FieldChar fieldCharEnd = new FieldChar() { FieldCharType = FieldCharValues.End };
+            runend.Append(fieldCharEnd);
+
+            Run emptyrun = new Run();
+
+            Run run1 = new Run();
+            FieldCode fieldCode1 = new FieldCode() { Space = SpaceProcessingModeValues.Preserve };
+            fieldCode1.Text = $" STYLEREF \"{stylename}\" \\n ";
+            run1.Append(fieldCode1);
+
+            Run run2 = new Run();
+            FieldCode fieldCode2 = new FieldCode() { Space = SpaceProcessingModeValues.Preserve };
+            fieldCode2.Text = $" SEQ Рисунок \\* ARABIC \\s {rule} ";
+            run2.Append(fieldCode2);
+            if (format == "Section")
+            {
+                item.Append(runbegin.CloneNode(true));
+                item.Append(run1.CloneNode(true));
+                item.Append(runseparate.CloneNode(true));
+                item.Append(emptyrun.CloneNode(true));
+                item.Append(runend.CloneNode(true));
+
+                item.Append(new Run(new Text(".")));
+            }
+
+            item.Append(runbegin.CloneNode(true));
+            item.Append(run2.CloneNode(true));
+            item.Append(runseparate.CloneNode(true));
+            item.Append(emptyrun.CloneNode(true));
+            item.Append(runend.CloneNode(true));
+        }
 
         private void SetParagraphStyle(Paragraph para, CommonGost.StyleTypeEnum typeStyle, bool clearAllProperties)
         {
@@ -378,7 +509,7 @@ namespace ProcessDocumentCore.Processing
 
         private void SetFooterPartStyle(WordprocessingDocument wDoc)
         {
-            if (!wDoc.MainDocumentPart.HeaderParts.Any()) return;
+            if (!wDoc.MainDocumentPart.FooterParts.Any()) return;
             var paragrpahs = wDoc.MainDocumentPart.FooterParts.FirstOrDefault().Footer.Descendants<Paragraph>().ToList();
             foreach (var p in paragrpahs)
             {
@@ -407,13 +538,44 @@ namespace ProcessDocumentCore.Processing
         }
 
         /// <summary>
+        /// Возвращает стиль абзаца из списка стилей документа или null
+        /// </summary>
+        /// <param name="para">Абзац</param>
+        /// <param name="styles">Стили документа</param>
+        /// <returns>Стиль абзаца</returns>
+        private Style GetParagraphStyle(Paragraph para, Styles styles)
+        {
+            if (para?.ParagraphProperties?.ParagraphStyleId == null) return null;
+
+            var styleid = para?.ParagraphProperties?.ParagraphStyleId.Val;
+            var style = styles.Descendants<Style>().FirstOrDefault(s => s.StyleId.Value == styleid.Value);
+
+            return style ?? null;
+        }
+
+        private string GetHeadlineStyleName(Paragraph paragraph, Body body, Styles styles)
+        {
+            string stylename = "0";
+            foreach (var p in body.Descendants<Paragraph>().ToList())
+            {
+                var style = GetParagraphStyle(p, styles);
+                if (style != null && IsParagraphHeader(p, styles))
+                    stylename = style.StyleName.Val;
+                if (stylename.ToLower().Contains("heading")) stylename = stylename.ToLower().Replace("heading", "Заголовок");
+                if (stylename == "List Paragraph") stylename = "Абзац списка";
+                if (p == paragraph) return stylename;
+            }
+            return "0";
+        }
+
+        /// <summary>
         /// Возвращает уровень пункта оглавления в документе по ссылке
         /// </summary>
         /// <param name="body">Тело документа</param>
         /// <param name="styles">Стили документа</param>
         /// <param name="anchor">Ссылка на абзац с заголовком</param>
         /// <returns>Уровень пункта оглавления</returns>
-        private int GetHeaderLevel(Body body, Styles styles, string anchor)
+        private int GetHeaderLevelByAnchor(Body body, Styles styles, string anchor)
         {
             int level = 1;
             if (anchor == null) return level - 1;
@@ -423,14 +585,10 @@ namespace ProcessDocumentCore.Processing
                 {
                     var paragraph = (Paragraph)bookmark.Parent;
                     var styleId = paragraph.ParagraphProperties.ParagraphStyleId.Val.ToString();
-                    foreach (var style in styles.Descendants<Style>())
-                    {
-                        if (style.StyleId == styleId)
-                        {
-                            var name = style.StyleName.Val.ToString();
-                            if (name.Contains("heading")) int.TryParse(name.Substring(name.Length - 1), out level);
-                        }
-                    }
+
+                    var name = GetParagraphStyle(paragraph, styles).StyleName.Val.ToString();
+                    if (name.Contains("heading")) int.TryParse(name.Substring(name.Length - 1), out level);
+
                 }
             }
             return level - 1;
@@ -447,9 +605,12 @@ namespace ProcessDocumentCore.Processing
 
             foreach (var para in TOC.Descendants<Paragraph>())
             {
-                string anchor = null;
+                if (para.ParagraphProperties == null) para.ParagraphProperties = new ParagraphProperties();
+                var style = GetParagraphStyle(para, styles);
 
-                if (para.Descendants<Hyperlink>().Any()) //Ищем ссылку на заголовок
+                //Ищем ссылку на заголовок
+                string anchor = null;
+                if (para.Descendants<Hyperlink>().Any())
                 {
                     var hyperlink = para.Descendants<Hyperlink>().FirstOrDefault();
                     anchor = hyperlink.Anchor;
@@ -460,18 +621,57 @@ namespace ProcessDocumentCore.Processing
                     anchor = field.Text.Substring(field.Text.IndexOf('\"') + 1, field.Text.Length - field.Text.IndexOf('\"') - 2);
                 }
 
-                if (para.ParagraphProperties == null) para.ParagraphProperties = new ParagraphProperties();
+                //Устанавливаем расположение табов
+                if (para.ParagraphProperties.Tabs != null || style?.StyleParagraphProperties?.Tabs != null)
+                {
+                    Tabs tabs = para.ParagraphProperties.Tabs ?? style.StyleParagraphProperties.Tabs;
+                    tabs.Descendants<TabStop>().Last().Remove();
+
+                    if (tabs.Count() > 0)
+                    {
+                        foreach (var tab in tabs.Descendants<TabStop>().ToList())
+                        {
+                            int ind = 0;
+                            if (para.ParagraphProperties.Indentation?.Left != null)
+                            {
+                                ind = Int32.Parse(para.ParagraphProperties.Indentation.Left);
+                            }
+                            else if (style.StyleParagraphProperties?.Indentation?.Left != null)
+                            {
+                                ind = Int32.Parse(style.StyleParagraphProperties?.Indentation?.Left);
+                            }
+
+                            int position = tab.Position - ind;
+                            tab.Position = _gostRepository.GetTOCIndentationLeft(GetHeaderLevelByAnchor(body, styles, anchor)) + position;
+                        }
+                    }
+
+                    TabStop pagenum = new TabStop()
+                    {
+                        Leader = _gostRepository.GetTOCTabLeader(),
+                        Position = _gostRepository.GetTOCTabPosition(),
+                        Val = TabStopValues.Right
+                    };
+                    tabs.Append(pagenum);
+                }
+                else
+                {
+                    Tabs tabs = new Tabs();
+                    tabs.Append(new TabStop()
+                    {
+                        Leader = _gostRepository.GetTOCTabLeader(),
+                        Position = _gostRepository.GetTOCTabPosition(),
+                        Val = TabStopValues.Right
+                    });
+                    para.ParagraphProperties.Append(tabs);
+                }
+
+                //Устанавливаем отступы
                 para.ParagraphProperties.Indentation = new Indentation()
                 {
-                    Left = _gostRepository.GetTOCIndentationLeft(GetHeaderLevel(body, styles, anchor)).ToString(),
+                    Left = _gostRepository.GetTOCIndentationLeft(GetHeaderLevelByAnchor(body, styles, anchor)).ToString(),
                     FirstLine = _gostRepository.GetTOCFirstIndentation().ToString()
                 };
-                if (para.ParagraphProperties.Tabs != null) //Устанавливаем точки между номером и заголовком и расположение номера
-                {
-                    TabStop pagenum = (TabStop)para.ParagraphProperties.Tabs.Last(t => t.GetType() == typeof(TabStop));
-                    pagenum.Leader = _gostRepository.GetTOCTabLeader();
-                    pagenum.Position = _gostRepository.GetTOCTabPosition();
-                }
             }
         }
 
